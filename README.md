@@ -7,4 +7,5 @@ To the other guys in the group - try and make some changes to this
 README and see if you can commit them or issue a pull request.
 
 Hey, This is Chris. Changing the readme and submitting pull request.
-I can't commit the code due to access level restrictions.
+Restrictions were lifted. If you are just reading this, make sure to
+give Eric your username so he can add you.
