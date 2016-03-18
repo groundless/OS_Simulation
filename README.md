@@ -9,3 +9,5 @@ README and see if you can commit them or issue a pull request.
 Hey, This is Chris. Changing the readme and submitting pull request.
 Restrictions were lifted. If you are just reading this, make sure to
 give Eric your username so he can add you.
+
+-Eric here, further changing the file to see how the branch updates.
