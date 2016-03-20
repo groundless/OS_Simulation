@@ -11,3 +11,5 @@ Restrictions were lifted. If you are just reading this, make sure to
 give Eric your username so he can add you.
 
 -Eric here, further changing the file to see how the branch updates.
+
+Han here, changing the README to see if I can push my changes to github. 
