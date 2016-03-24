@@ -34,8 +34,8 @@ int main(void)
 	 * auto-generates processes for ease of testing.
 	 */
 
-	begin_input_processing();
-	//debug_input_processing();
+	//begin_input_processing();
+	debug_input_processing();
 
 	/*
 	 * Initial process arrival, the OS always starts with something running?

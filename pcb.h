@@ -34,9 +34,30 @@ typedef struct
 	// Between 0 - 5 requests
 	int io_requests;
 
+	// Completed IO requests
+	int io_completed;
+
 	// Between 1mb and 8mb
 	int size;
 
 }PCB;
+
+/*
+class PCB {
+	int process_id;
+	string state;
+	int total_runtime;
+	int elapsed_runtime;
+	int io_requests;
+	int io_completed;
+	int size;
+  public:
+    int iorequests_remaining() {return io_requests - io_completed;}
+    int runtime_remaining() {return total_runtime - elapsed_runtime;}
+    bool check_state(string check) {return (state == check);}
+    int get_id() {return process_id;}
+    int get_size() {return size;}
+};
+*/
 
 #endif /* PCB_H_ */
