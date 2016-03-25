@@ -40,13 +40,13 @@ PCB::PCB (int id, string s,
  * Temporary debugging processes coming into the OS
  */
 void debug_input_processing() {
-	int num_processes = 60;
+	int num_processes = 10;
 	int size_min = 1;
 	int size_max = 8;
-	int arrival_min = 10;
-	int arrival_max = 999;
+	//int arrival_min = 10;
+	//int arrival_max = 100;
 	int runtime_min = 1;
-	int runtime_max = 10;
+	int runtime_max = 100;
 	int io_min = 0;
 	int io_max = 5;
 
@@ -58,7 +58,7 @@ void debug_input_processing() {
 				rand() % 100,
 				"NEW",
 				rand() % runtime_max + runtime_min,
-				arrival_max - arrival_min,
+				0,
 				io_max,
 				io_min,
 				rand() % size_max + size_min);
@@ -147,8 +147,8 @@ int main(void)
 		// Run the current process in the RUNNING state
 		execute_running_process();
 
-		// Check for interrupts and preemption, possibly:
-		// check_interrupts() or preempt_process();
+		// Check for interrupts and preemption
+		check_interrupts();
 
 		// Debugging print for the new and ready queues
 		debug_print_new_ready();

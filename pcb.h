@@ -110,6 +110,15 @@ class PCB {
      * Simulates completion of an IO requests, increments io_completed.
      */
     void finish_iorequest() {io_completed++;}
+
+    /*
+     * Simulates an IO request based on how may IO requests remain,
+     * and the total runtime that the process has been running.
+     */
+    bool request_io() {
+    	if ((io_requests - io_completed) == 0) return false;
+    	return ((total_runtime / (io_requests - io_completed)) < elapsed_runtime);
+    }
 };
 
 

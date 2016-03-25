@@ -23,6 +23,17 @@ std::vector<PCB> new_queue;
 std::vector<PCB> ready_queue;
 
 /*
+ * Blocked queue for processes waiting on IO
+ */
+std::vector<PCB> blocked_queue;
+
+/*
+ * List of processes that have completed. May not be needed.
+ * But used anyway to store the history of processes in the OS.
+ */
+std::vector<PCB> finished_list;
+
+/*
  * The main running process.
  * Possibly a better way to implement this.
  */
@@ -57,13 +68,16 @@ void new_process_arrival(PCB new_arrival)
  */
 void allocate_memory()
 {
-	if (new_queue.empty())
+	if (new_queue.empty()){
+		if (DEBUG) cout << "DEBUG: (allocate_memory): New queue is empty." << endl;
 		return;
+	}
 
 	PCB next_process = new_queue.back();
 
 	if (next_process.get_size() <= available_memory){
-
+		if (DEBUG) cout << "DEBUG: (allocate_memory): available_memory " << available_memory << endl;
+		if (DEBUG) cout << "DEBUG: (allocate_memory): Process " << next_process.get_id() << " is size " << next_process.get_size() << endl;
 		available_memory -= next_process.get_size();
 		new_queue.pop_back();
 		next_process.set_state("READY");
@@ -102,8 +116,11 @@ void process_exit() {
 	}
 
 	// Finish fixing the main_memory array
-
+	available_memory += running_process.get_size();
 	running_process.set_state("EXIT");
+	PCB finished_process = running_process;
+	finished_list.push_back(finished_process);
+	running_process.set_state("NULL");
 }
 
 /*
@@ -112,10 +129,9 @@ void process_exit() {
  */
 void check_interrupts () {
 
-	// Process all IO requests before runtime reaches zero
-
 	// Check if the running process has any IO requests
-	if (running_process.iorequests_remaining() > 0) {
+	if (running_process.request_io()) {
+		if (DEBUG) cout << "DEBUG: (check_interupts): Running Process has an IO Request " << endl;
 		// Process IO requests
 		running_process.finish_iorequest();
 	}
@@ -129,17 +145,22 @@ void check_interrupts () {
  */
 void short_term_scheduler () {
 	if (running_process.check_state("NULL")) {
-		if (DEBUG) cout << "DEBUG: Short term scheduler sees no process currently running" << endl;
+		if (DEBUG) cout << "DEBUG: (short_term_scheduler): no process currently running" << endl;
 		if (ready_queue.empty()) {
-			if (DEBUG) cout << "DEBUG: Short term scheduler sees Ready Queue is currently empty" << endl;
+			if (DEBUG) cout << "DEBUG: (short_term_scheduler): Ready Queue is currently empty" << endl;
 			return;
 		}
 		running_process = ready_queue.back();
 		ready_queue.pop_back();
-		if (DEBUG) cout << "DEBUG: Short term scheduler put Process: " << running_process.get_id() << " into running" << endl;
+		if (DEBUG) cout << "DEBUG: (short_term_scheduler): put process: " << running_process.get_id() << " into running" << endl;
 	}
-	else
-		if (DEBUG) cout << "DEBUG: Short term scheduler: Current running process ID is :" << running_process.get_id() << endl;
+	else {
+		if (DEBUG) cout << "DEBUG: (short_term_scheduler): Current running process ID is :" << running_process.get_id() << endl;
+		if (running_process.runtime_remaining() == 0) {
+			if (DEBUG) cout << "DEBUG: (short_term_scheduler): Running Process has finished " << endl;
+			process_exit();
+		}
+	}
 }
 
 
@@ -152,12 +173,15 @@ void debug_print_new_ready () {
 		cout << "DEBUG: New Queue" << endl;
 		cout << "DEBUG: New Queue size is " << new_queue.size() << endl;
 		for (index = 0; index < new_queue.size(); index++) {
-			//cout << "DEBUG: New Queue - Process " << (index + 1) << " size is: " << new_queue.at(index).size << endl;
+			cout << "DEBUG: New Queue - Process " << new_queue.at(index).get_id() << " size is: " << new_queue.at(index).get_size() << endl;
 		}
 		cout << "DEBUG: Ready Queue" << endl;
 		cout << "DEBUG: Ready Queue size is " << ready_queue.size() << endl;
 		for (index = 0; index < ready_queue.size(); index++) {
-			//cout << "DEBUG: Ready Queue - Process " << (index + 1) << " size is: " << ready_queue.at(index).size << endl;
+			cout << "DEBUG: Ready Queue -  Process " << ready_queue.at(index).get_id() << " size is: " << ready_queue.at(index).get_size() << endl;
+		}
+		if (!running_process.check_state("NULL")) {
+			cout << "DEBUG: Running Process - " << running_process.get_id() << " size is " << running_process.get_size() << endl;
 		}
 	}
 }
