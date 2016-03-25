@@ -5,12 +5,24 @@
 // Description : Long term scheduling bringing processes into NEW and NEW->READY
 //============================================================================
 
-#include <vector>
-#include "pcb.h"
-#include "input_processing.h"
-
 #ifndef LONG_TERM_SCHEDULER_H_
 #define LONG_TERM_SCHEDULER_H_
+
+#include "pcb.h"
+#include <vector>
+#include <iostream>
+#include <sstream>
+#include <time.h>
+#include <stdlib.h>
+#include <string>
+using std::cout;
+using std::cin;
+using std::stringstream;
+using std::basic_istream;
+using std::basic_iostream;
+using std::iostream;
+using std::endl;
+using std::vector;
 
 
 /*

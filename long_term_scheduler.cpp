@@ -35,7 +35,7 @@ PCB running_process;
 void initialize_memory()
 {
 	available_memory = MEM_SIZE;
-	running_process.state = "NULL";
+	running_process.set_state("NULL");
 }
 
 /*
@@ -43,10 +43,10 @@ void initialize_memory()
  */
 void new_process_arrival(PCB new_arrival)
 {
-	if (new_arrival.state == "NULL")
+	if (new_arrival.check_state("NULL"))
 		return;
 
-	new_arrival.state = "NEW";
+	new_arrival.set_state("NEW");
 	new_queue.push_back(new_arrival);
 	allocate_memory();
 }
@@ -62,11 +62,11 @@ void allocate_memory()
 
 	PCB next_process = new_queue.back();
 
-	if (next_process.size <= available_memory){
+	if (next_process.get_size() <= available_memory){
 
-		available_memory -= next_process.size;
+		available_memory -= next_process.get_size();
 		new_queue.pop_back();
-		next_process.state = "READY";
+		next_process.set_state("READY");
 		ready_queue.push_back(next_process);
 	}
 }
@@ -75,15 +75,14 @@ void allocate_memory()
  * Increments elapsed time of the current RUNNING process.
  */
 void execute_running_process () {
-	if (running_process.state == "NULL") {
+	if (running_process.check_state("NULL")) {
 		if (DEBUG) cout << "DEBUG: (execute_running_process): No currently running process" << endl;
 		return;
 	}
-	running_process.elapsed_runtime++;
-	if (DEBUG) cout << "DEBUG: (execute_running_process): Running Process current runtime is: " << running_process.elapsed_runtime << endl;
-	if (DEBUG) cout << "DEBUG: (execute_running_process): Running Process remaining time to complete: " << (running_process.total_runtime - running_process.elapsed_runtime) << endl;
+	running_process.execute_instruction();
+	if (DEBUG) cout << "DEBUG: (execute_running_process): Running Process remaining time to complete: " << running_process.runtime_remaining() << endl;
 
-	if (running_process.total_runtime - running_process.elapsed_runtime == 0) {
+	if (running_process.runtime_remaining() == 0) {
 		if (DEBUG) cout << "DEBUG: (execute_running_process): Process has finished running" << endl;
 		process_exit();
 	}
@@ -98,13 +97,13 @@ void execute_running_process () {
 void process_exit() {
 	int i;
 	for (i = 0; i < MEM_SIZE; i++) {
-		if (main_memory[i] == running_process.process_id)
+		if (main_memory[i] == running_process.get_id())
 			main_memory[i] = 0;
 	}
 
 	// Finish fixing the main_memory array
 
-	running_process.state = "EXIT";
+	running_process.set_state("EXIT");
 }
 
 /*
@@ -116,9 +115,9 @@ void check_interrupts () {
 	// Process all IO requests before runtime reaches zero
 
 	// Check if the running process has any IO requests
-	if (running_process.io_requests > 0 && (running_process.io_requests != running_process.io_completed)) {
+	if (running_process.iorequests_remaining() > 0) {
 		// Process IO requests
-		running_process.io_completed++;
+		running_process.finish_iorequest();
 	}
 
 }
@@ -129,7 +128,7 @@ void check_interrupts () {
  * working that we also know is working will take some time.
  */
 void short_term_scheduler () {
-	if (running_process.state == "NULL") {
+	if (running_process.check_state("NULL")) {
 		if (DEBUG) cout << "DEBUG: Short term scheduler sees no process currently running" << endl;
 		if (ready_queue.empty()) {
 			if (DEBUG) cout << "DEBUG: Short term scheduler sees Ready Queue is currently empty" << endl;
@@ -137,10 +136,10 @@ void short_term_scheduler () {
 		}
 		running_process = ready_queue.back();
 		ready_queue.pop_back();
-		if (DEBUG) cout << "DEBUG: Short term scheduler put Process: " << running_process.process_id << " into running" << endl;
+		if (DEBUG) cout << "DEBUG: Short term scheduler put Process: " << running_process.get_id() << " into running" << endl;
 	}
 	else
-		if (DEBUG) cout << "DEBUG: Short term scheduler: Current running process ID is :" << running_process.process_id << endl;
+		if (DEBUG) cout << "DEBUG: Short term scheduler: Current running process ID is :" << running_process.get_id() << endl;
 }
 
 
@@ -153,12 +152,12 @@ void debug_print_new_ready () {
 		cout << "DEBUG: New Queue" << endl;
 		cout << "DEBUG: New Queue size is " << new_queue.size() << endl;
 		for (index = 0; index < new_queue.size(); index++) {
-			cout << "DEBUG: New Queue - Process " << (index + 1) << " size is: " << new_queue.at(index).size << endl;
+			//cout << "DEBUG: New Queue - Process " << (index + 1) << " size is: " << new_queue.at(index).size << endl;
 		}
 		cout << "DEBUG: Ready Queue" << endl;
 		cout << "DEBUG: Ready Queue size is " << ready_queue.size() << endl;
 		for (index = 0; index < ready_queue.size(); index++) {
-			cout << "DEBUG: Ready Queue - Process " << (index + 1) << " size is: " << ready_queue.at(index).size << endl;
+			//cout << "DEBUG: Ready Queue - Process " << (index + 1) << " size is: " << ready_queue.at(index).size << endl;
 		}
 	}
 }
