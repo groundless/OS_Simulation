@@ -19,6 +19,15 @@ using std::string;
  * comments on each of the data members, which we can do after
  * we fully understand how they are being used.
  */
+
+/*
+ * From the Project Specifications:
+ * For each active process the following information should be displayed:
+ * amount of CPU time needed to complete, amount of CPU time already used,
+ * priority (if relevant), number of I/O requests satisfied,
+ * number of outstanding I/O requests.
+ */
+
 class PCB {
 
 	/*
@@ -94,6 +103,16 @@ class PCB {
      * Returns the process size
      */
     int get_size() {return size;}
+
+    /*
+     * Returns the elapsed runtime
+     */
+    int get_elapsed_runtime() {return elapsed_runtime;}
+
+    /*
+     * Returns IO requests satisfied
+     */
+    int get_io_completed() {return io_completed;}
 
     /*
      * Set the current process state to the argument state.
