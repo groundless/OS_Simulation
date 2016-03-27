@@ -127,18 +127,22 @@ int main(void)
 
 	do {
 
-		/* Check if any new processes have arrived first.
-		 * Pass the next process from input_processing to long_term_scheduler
+		/*
+		 * Check if any new processes have arrived first.
 		 * If no processes have arrived, only passes a NULL reference.
 		 */
-
 		new_process_arrival(retrieve_next_process());
+
+		/*
+		 * Long term FCFS scheduler
+		 * Simulates process arrival.
+		 */
+		long_term_scheduler();
 
 		/*
 		 * Short term preemptive scheduler.
 		 * Needs to be implemented!
 		 */
-
 		short_term_scheduler();
 
 		// Increase cycle count of the fetch-execute-interrupt cycle

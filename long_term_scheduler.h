@@ -32,7 +32,7 @@ using std::vector;
  */
 void initialize_memory();
 void new_process_arrival(PCB new_arrival);
-void allocate_memory();
+void long_term_scheduler();
 
 void execute_running_process();
 void short_term_scheduler();

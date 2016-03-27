@@ -64,27 +64,27 @@ void new_process_arrival(PCB new_arrival)
 
 	new_arrival.set_state("NEW");
 	new_queue.push_back(new_arrival);
-	allocate_memory();
 }
 
 /*
- * Basically the long term scheduler, maybe could use a different name:
- * Uses the LIFO property of the queue to simulate process arrival i.e. FCFS.
+ * Uses FCFS to simulate process arrival.
  */
-void allocate_memory()
+void long_term_scheduler()
 {
 	if (new_queue.empty()){
 		if (DEBUG) cout << "DEBUG: (allocate_memory): New queue is empty." << endl;
 		return;
 	}
 
-	PCB next_process = new_queue.back();
+	PCB next_process = new_queue.front();
 
-	if (next_process.get_size() <= available_memory){
+	if (next_process.get_size() <= available_memory) {
 		if (DEBUG) cout << "DEBUG: (allocate_memory): available_memory " << available_memory << endl;
-		if (DEBUG) cout << "DEBUG: (allocate_memory): Process " << next_process.get_id() << " is size " << next_process.get_size() << endl;
+		if (DEBUG) cout << "DEBUG: (allocate_memory): allocating Process " << next_process.get_id() << " with size " << next_process.get_size() << endl;
 		available_memory -= next_process.get_size();
-		new_queue.pop_back();
+		if (DEBUG) cout << "DEBUG: (allocate_memory): allocated memory, available_memory now " << available_memory << endl;
+
+		new_queue.erase(new_queue.begin());
 		next_process.set_state("READY");
 		ready_queue.push_back(next_process);
 	}
@@ -199,20 +199,47 @@ void check_interrupts () {
  * working that we also know is working will take some time.
  */
 void short_term_scheduler () {
+
+	// Check if there is no process currently running
 	if (running_process.check_state("NULL")) {
+
 		if (DEBUG) cout << "DEBUG: (short_term_scheduler): no process currently running" << endl;
+
+		// Check if the ready queue is empty
 		if (ready_queue.empty()) {
+
 			if (DEBUG) cout << "DEBUG: (short_term_scheduler): Ready Queue is currently empty" << endl;
+
+			// Check if the new queue is empty
+			if (new_queue.empty()) {
+
+				if (DEBUG) cout << "DEBUG: (short_term_scheduler): New Queue is also currently empty" << endl;
+
+				// Do nothing? Long term scheduler will eventually put a process into the new/ready queue?
+			}
+
+			// Nothing to run, short term scheduler did nothing.
 			return;
 		}
-		running_process = ready_queue.back();
-		ready_queue.pop_back();
+
+		// Get the next process from the ready queue
+		running_process = ready_queue.front();
+
+		// Remove that process from the front of the ready queue
+		ready_queue.erase(ready_queue.begin());
+
 		if (DEBUG) cout << "DEBUG: (short_term_scheduler): put process: " << running_process.get_id() << " into running" << endl;
 	}
 	else {
+
+		// A process is already running
 		if (DEBUG) cout << "DEBUG: (short_term_scheduler): Current running process ID is :" << running_process.get_id() << endl;
+
+		// Check if that process has finished yet
 		if (running_process.runtime_remaining() == 0) {
 			if (DEBUG) cout << "DEBUG: (short_term_scheduler): Running Process has finished " << endl;
+
+			// The finished process now goes from READY->EXIT
 			process_exit();
 		}
 	}
