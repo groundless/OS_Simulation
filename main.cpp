@@ -1,24 +1,86 @@
 //============================================================================
 // Name        : main.cpp
 // Author      :
-// Version     : 0.02
+// Version     : 0.03
 // Description : Main OS
 //============================================================================
-#include <iostream>
-#include <string>
+
 #include "long_term_scheduler.h"
-#include "input_processing.h"
 
-// This must change once all the headers are compiled
-// Generally bad form to just include all of std.
-using namespace std;
 
-// Probably unnecessary print and swap functions
-// void print_array(int* array, int n);
-// void swap(int &a, int &b);
+// Temporary list of processes simulating arrival.
+std::vector<PCB> process_list;
+
+// Default constructor for the PCB
+PCB::PCB () {
+	process_id = -1;
+	state = "NULL";
+	total_runtime = 0;
+	elapsed_runtime = 0;
+	io_requests = 0;
+	io_completed = 0;
+	size = 0;
+}
+
+// Detailed constructor for PCB, needs all the information.
+PCB::PCB (int id, string s,
+		  int tr, int er,
+		  int ior, int ioc,
+		  int sz) {
+	process_id = id;
+	state = s;
+	total_runtime = tr;
+	elapsed_runtime = er;
+	io_requests = ior;
+	io_completed = ioc;
+	size = sz;
+}
+
+/*
+ * Temporary debugging processes coming into the OS
+ */
+void debug_input_processing() {
+	int num_processes = 10;
+	int size_min = 1;
+	int size_max = 8;
+	//int arrival_min = 10;
+	//int arrival_max = 100;
+	int runtime_min = 1;
+	int runtime_max = 100;
+	int io_min = 0;
+	int io_max = 5;
+
+	srand(time(NULL));
+
+	int index;
+	for (index = 0; index < num_processes; index++) {
+		PCB next_process(
+				rand() % 100,
+				"NEW",
+				rand() % runtime_max + runtime_min,
+				0,
+				io_max,
+				io_min,
+				rand() % size_max + size_min);
+		process_list.push_back(next_process);
+	}
+}
+
+PCB retrieve_next_process () {
+	PCB next_process;
+	next_process.set_state("NULL");
+	if (process_list.empty()) {
+		if (DEBUG){cout << "Process list is empty" << endl;}
+		return next_process;
+	}
+	next_process = process_list.back();
+	process_list.pop_back();
+	return next_process;
+}
 
 int main(void)
 {
+
 	/*
 	 * Initially read in inputs and build processes
 	 * Run long term scheduler to put a few processes into NEW
@@ -34,8 +96,8 @@ int main(void)
 	 * auto-generates processes for ease of testing.
 	 */
 
-	begin_input_processing();
-	//debug_input_processing();
+	//begin_input_processing();
+	debug_input_processing();
 
 	/*
 	 * Initial process arrival, the OS always starts with something running?
@@ -65,18 +127,22 @@ int main(void)
 
 	do {
 
-		/* Check if any new processes have arrived first.
-		 * Pass the next process from input_processing to long_term_scheduler
+		/*
+		 * Check if any new processes have arrived first.
 		 * If no processes have arrived, only passes a NULL reference.
 		 */
-
 		new_process_arrival(retrieve_next_process());
+
+		/*
+		 * Long term FCFS scheduler
+		 * Simulates process arrival.
+		 */
+		long_term_scheduler();
 
 		/*
 		 * Short term preemptive scheduler.
 		 * Needs to be implemented!
 		 */
-
 		short_term_scheduler();
 
 		// Increase cycle count of the fetch-execute-interrupt cycle
@@ -85,8 +151,8 @@ int main(void)
 		// Run the current process in the RUNNING state
 		execute_running_process();
 
-		// Check for interrupts and preemption, possibly:
-		// check_interrupts() or preempt_process();
+		// Check for interrupts and preemption
+		check_interrupts();
 
 		// Debugging print for the new and ready queues
 		debug_print_new_ready();
@@ -107,20 +173,3 @@ int main(void)
 
 	return 0;
 }
-
-/*
-void swap(int &a, int &b)
-{
-	int temp;
-	temp = a;
-	a = b;
-	b = temp;
-}
-
-void print_array(int* array, int n)
-{
-	int i;
-	for(i = 0; i < n; i++)
-		cout << array[i] << '\t';
-}
-*/
