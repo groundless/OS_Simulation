@@ -1,7 +1,7 @@
 //============================================================================
-// Name        : long_term_scheduler.cpp
-// Author      :
-// Version     :
+// Name				 : long_term_scheduler.cpp
+// Author			 :
+// Version		 :
 // Description : Source file for long term scheduler
 //============================================================================
 
@@ -52,6 +52,69 @@ void initialize_memory()
 {
 	available_memory = MEM_SIZE;
 	running_process.set_state("NULL");
+
+	for(int i = 0; i < MEM_SIZE; i++)
+		main_memory[i] = 0;
+}
+
+//
+// New processes are allocated memory in the main_memory array. 
+//
+void memory_allocate(PCB new_arrival)
+{
+	int PID = new_arrival.get_id();
+	int requested_memory = new_arrival.get_size();
+	int free_memory = 0;
+
+	while(main_memory[free_memory] != 0)
+		free_memory++;
+
+	if((MEM_SIZE - free_memory) >= requested_memory)
+		for(int i = free_memory; i < free_memory + requested_memory; i++)
+			main_memory[i] = PID;
+	else
+	{
+		cout << "Not enough memory for process " << PID << "\n";
+	}
+}
+
+// 
+// Processes that are finished running have their memory removed. 
+// Remaining memory is then shifted down. 
+//
+void memory_deallocate(PCB finished_process)
+{
+	int i = 0;
+	int j;
+	int PID = finished_process.get_id();
+	while(main_memory[i] != PID)
+		i++;
+	j = i;
+	while(main_memory[j] == PID)
+	{
+		main_memory[j] = 0;
+		j++;
+	}
+	while(main_memory[j] != 0 && j < MEM_SIZE)
+	{
+		main_memory[i] = main_memory[j];
+		main_memory[j] = 0;
+		i++;
+		j++;
+	}
+}
+
+//
+// Print out the main_memory array visually. 
+// For debugging purposes. 
+//
+void print_memory()
+{
+	for (int i = 0; i < MEM_SIZE; i++)
+	{
+		cout << "\t" << main_memory[i];
+	}
+	cout << "\n";
 }
 
 /*
@@ -86,8 +149,10 @@ void long_term_scheduler()
 
 		new_queue.erase(new_queue.begin());
 		next_process.set_state("READY");
+		memory_allocate(next_process);
 		ready_queue.push_back(next_process);
 	}
+	print_memory();
 }
 
 /*
@@ -114,12 +179,12 @@ void execute_running_process () {
  */
 
 void process_exit() {
-	int i;
-	for (i = 0; i < MEM_SIZE; i++) {
-		if (main_memory[i] == running_process.get_id())
-			main_memory[i] = 0;
-	}
-
+//	int i;
+//	for (i = 0; i < MEM_SIZE; i++) {
+//		if (main_memory[i] == running_process.get_id())
+//			main_memory[i] = 0;
+//	}
+	memory_deallocate(running_process);
 	// Finish fixing the main_memory array
 	available_memory += running_process.get_size();
 	running_process.set_state("EXIT");

@@ -55,7 +55,7 @@ void debug_input_processing() {
 	int index;
 	for (index = 0; index < num_processes; index++) {
 		PCB next_process(
-				rand() % 100,
+				rand() % 99 + 1,
 				"NEW",
 				rand() % runtime_max + runtime_min,
 				0,
