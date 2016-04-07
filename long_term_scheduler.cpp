@@ -88,27 +88,33 @@ void long_term_scheduler()
 {
 	// If there is nothing is the NEW queue, then no decisions are to be made.
 	if (new_queue.empty()){
-		if (DEBUG) cout << "DEBUG: (allocate_memory): New queue is empty." << endl;
+		if (DEBUG) cout << "DEBUG: (long_term_scheduler): New queue is empty." << endl;
 		return;
 	}
 
 	PCB next_process = new_queue.front();
 
-	// Check if memory is available yet for the next process in line.
+	// Check if memory is available for the next process in line.
 	if (next_process.get_size() <= available_memory) {
 
-		if (DEBUG) cout << "DEBUG: (allocate_memory): available_memory " << available_memory << endl;
-		if (DEBUG) cout << "DEBUG: (allocate_memory): allocating Process " << next_process.get_id() << " with size " << next_process.get_size() << endl;
+		if (DEBUG) cout << "DEBUG: (long_term_scheduler): available_memory " << available_memory << endl;
+		if (DEBUG) cout << "DEBUG: (long_term_scheduler): allocating Process " << next_process.get_id() << " with size " << next_process.get_size() << endl;
 
 		available_memory -= next_process.get_size();
 
-		if (DEBUG) cout << "DEBUG: (allocate_memory): allocated memory, available_memory now " << available_memory << endl;
+		if (DEBUG) cout << "DEBUG: (long_term_scheduler): allocated memory, available_memory now " << available_memory << endl;
 
 		memory_allocate(next_process);
 
+		// Remove the process from the NEW queue
 		new_queue.erase(new_queue.begin());
+
+		// Change the process to READY and move to the READY queue
 		next_process.set_state("READY");
 		ready_queue.push_back(next_process);
+
+		// Memory was allocated, and the process has moved from NEW->READY
+		state_changed_flag = true;
 	}
 }
 

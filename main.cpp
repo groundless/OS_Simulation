@@ -70,11 +70,10 @@ int main(void)
 	initialize_memory();
 
 	/*
-	 * Two input processing options, one is manual and the other
-	 * auto-generates processes for ease of testing.
+	 * Temporary debugging process generation
+	 * See the above functions
 	 */
 
-	//begin_input_processing();
 	debug_input_processing();
 
 	/*
@@ -116,13 +115,14 @@ int main(void)
 		 * Simulates process arrival.
 		 */
 		long_term_scheduler();
+		hold_on_state_change();
 
 		// Debugging print for the main memory locations
 		debug_print_memory();
 
 		/*
 		 * Short term preemptive scheduler.
-		 * Needs to be implemented!
+		 * Needs to be implemented as Round Robin
 		 */
 		short_term_scheduler();
 
@@ -132,7 +132,7 @@ int main(void)
 		// Run the current process in the RUNNING state
 		execute_running_process();
 
-		// Check for interrupts and preemption
+		// Check for any interrupts
 		check_io_interrupt();
 
 		// Debugging print for the new and ready queues
@@ -153,4 +153,14 @@ int main(void)
 	getline(cin, input);
 
 	return 0;
+}
+
+void hold_on_state_change() {
+	string input;
+	if (state_changed_flag) {
+		cout << "State has changed" << endl;
+		cout << "Press any key to continue" << endl;
+		getline(cin, input);
+		state_changed_flag = false;
+	}
 }

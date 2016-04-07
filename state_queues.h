@@ -45,4 +45,10 @@ extern std::vector<PCB> finished_list;
 extern PCB running_process;
 
 
+/*
+ * boolean flag used to halt when a process state has changed.
+ * implemented in accordance with the project specifications.
+ */
+extern bool state_changed_flag;
+
 #endif /* STATE_QUEUES_ */
