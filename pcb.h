@@ -9,7 +9,19 @@
 #define PCB_H_
 
 #include <string>
+#include <vector>
+#include <iostream>
+#include <sstream>
+#include <time.h>
+#include <stdlib.h>
 using std::string;
+using std::cout;
+using std::cin;
+using std::stringstream;
+using std::basic_istream;
+using std::basic_iostream;
+using std::iostream;
+using std::endl;
 
 // Used for various debugging functions, set to false on release
 #define DEBUG true
@@ -140,5 +152,29 @@ class PCB {
     }
 };
 
+// Default constructor for the PCB
+inline PCB::PCB () {
+	process_id = -1;
+	state = "NULL";
+	total_runtime = 0;
+	elapsed_runtime = 0;
+	io_requests = 0;
+	io_completed = 0;
+	size = 0;
+}
+
+// Detailed constructor for PCB, needs all the information.
+inline PCB::PCB (int id, string s,
+		  int tr, int er,
+		  int ior, int ioc,
+		  int sz) {
+	process_id = id;
+	state = s;
+	total_runtime = tr;
+	elapsed_runtime = er;
+	io_requests = ior;
+	io_completed = ioc;
+	size = sz;
+}
 
 #endif /* PCB_H_ */

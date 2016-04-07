@@ -6,35 +6,11 @@
 //============================================================================
 
 #include "long_term_scheduler.h"
+#include "short_term_scheduler.h"
 
 
 // Temporary list of processes simulating arrival.
 std::vector<PCB> process_list;
-
-// Default constructor for the PCB
-PCB::PCB () {
-	process_id = -1;
-	state = "NULL";
-	total_runtime = 0;
-	elapsed_runtime = 0;
-	io_requests = 0;
-	io_completed = 0;
-	size = 0;
-}
-
-// Detailed constructor for PCB, needs all the information.
-PCB::PCB (int id, string s,
-		  int tr, int er,
-		  int ior, int ioc,
-		  int sz) {
-	process_id = id;
-	state = s;
-	total_runtime = tr;
-	elapsed_runtime = er;
-	io_requests = ior;
-	io_completed = ioc;
-	size = sz;
-}
 
 /*
  * Temporary debugging processes coming into the OS
