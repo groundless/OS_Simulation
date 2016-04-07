@@ -7,20 +7,7 @@
 
 #include "long_term_scheduler.h"
 
-/*
- * main_memory array contains sixteen indexes, each representing
- * one megabyte of memory. Each index will contain the process_id
- * of the process occupying that megabyte of memory.
- */
-#define MEM_SIZE 16
-int main_memory[MEM_SIZE];
 int available_memory;
-
-/*
- * Counts the number of cycles for an IO Request
- * Possibly a cleaner way to implement this
- */
-int io_cycle_count = 0;
 
 /*
  * Basic initializations go here to keep the code clean.
@@ -81,20 +68,6 @@ void memory_deallocate(PCB finished_process)
 	}
 }
 
-//
-// Print out the main_memory array visually. 
-// For debugging purposes. 
-//
-void print_memory()
-{
-	if (DEBUG)
-	{
-		for (int i = 0; i < MEM_SIZE; i++)
-		{
-			cout << "Main Memory " << i << ": PID " << main_memory[i] << endl;
-		}
-	}
-}
 
 /*
  * Simulates the arrival of a new process into the OS.
@@ -137,7 +110,6 @@ void long_term_scheduler()
 		next_process.set_state("READY");
 		ready_queue.push_back(next_process);
 	}
-	print_memory();
 }
 
 /*
@@ -181,92 +153,4 @@ void process_exit() {
 	PCB null_process;
 	running_process = null_process;
 	running_process.set_state("NULL");
-}
-
-/*
- * Check for interrupts, including both IO requests as well as
- * interrupts from the short term scheduler because of time slicing.
- * An I/O operation takes somewhere between 25 to 50 cycles.
- * A time slice occurs every ten cycles.
- */
-void check_interrupts () {
-
-	// Check if the running process has any IO requests
-	if (running_process.request_io()) {
-
-		// Set the counter for how many cycles until IO Completion
-		// Should be a random number between 25 - 50
-		if (blocked_queue.empty()) io_cycle_count = 25;
-
-		if (DEBUG) cout << "DEBUG: (check_interupts): Running Process has an IO Request " << endl;
-
-		// Indicate that the running process is now BLOCKED
-		// Blocked processes remain in main memory
-		running_process.set_state("BLOCKED");
-
-		// Block running process while IO request is fulfilled
-		blocked_queue.push_back(running_process);
-
-		// Currently no running process, set a null process,
-		// in order to prevent any erroneous checks from passing
-		// maybe the running_process should just be a vector?
-		PCB null_process;
-		running_process = null_process;
-		running_process.set_state("NULL");
-	}
-	// Check if the IO device is in use
-	if (io_cycle_count > 0) {
-
-		// Execute a cycle of the IO device
-		io_cycle_count--;
-		if (DEBUG) cout << "DEBUG: (check_interupts): io_cycle_count is " << io_cycle_count << endl;
-
-		// Check if the IO has completed
-		if (io_cycle_count == 0) {
-			if (DEBUG) cout << "DEBUG: (check_interupts): IO Request Completed " << endl;
-			if (DEBUG) cout << "DEBUG: (check_interupts): Process " << blocked_queue.front().get_id() << " has completed an IO Request " << endl;
-
-			// Simulate completion of the IO request
-			blocked_queue.front().finish_iorequest();
-
-			// Move the process back onto the end of the Ready Queue
-			ready_queue.push_back(blocked_queue.front());
-
-			// Remove the process from the blocked queue
-			blocked_queue.erase(blocked_queue.begin());
-
-			// Check if there are still outstanding IO Requests
-			if (!blocked_queue.empty()) {
-
-				// Reset the cycle count to somewhere between 25 - 50 cycles
-				 io_cycle_count = 25;
-				 if (DEBUG) cout << "DEBUG: (check_interupts): Resetting io_cycle_count to " << io_cycle_count << endl;
-			}
-		}
-	}
-}
-
-
-/*
- * Debugging function, prints out the processes in the NEW and READY queue.
- */
-void debug_print_new_ready () {
-	unsigned int index;
-	if (DEBUG) {
-		cout << "DEBUG: New Queue size is " << new_queue.size() << endl;
-		for (index = 0; index < new_queue.size(); index++) {
-			cout << "DEBUG: New Queue - Process " << new_queue.at(index).get_id() << " size is: " << new_queue.at(index).get_size() << endl;
-		}
-		cout << "DEBUG: Ready Queue size is " << ready_queue.size() << endl;
-		for (index = 0; index < ready_queue.size(); index++) {
-			cout << "DEBUG: Ready Queue -  Process " << ready_queue.at(index).get_id() << " size is: " << ready_queue.at(index).get_size() << endl;
-		}
-		cout << "DEBUG: Blocked Queue size is " << blocked_queue.size() << endl;
-		for (index = 0; index < blocked_queue.size(); index++) {
-			cout << "DEBUG: Blocked Queue -  Process " << blocked_queue.at(index).get_id() << " size is: " << blocked_queue.at(index).get_size() << endl;
-		}
-		if (!running_process.check_state("NULL")) {
-			cout << "DEBUG: Running Process - " << running_process.get_id() << " size is " << running_process.get_size() << endl;
-		}
-	}
 }

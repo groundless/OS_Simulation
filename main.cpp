@@ -5,8 +5,10 @@
 // Description : Main OS
 //============================================================================
 
+#include "io_requests.h"
 #include "long_term_scheduler.h"
 #include "short_term_scheduler.h"
+#include "output_ui.h"
 
 
 // Temporary list of processes simulating arrival.
@@ -115,6 +117,9 @@ int main(void)
 		 */
 		long_term_scheduler();
 
+		// Debugging print for the main memory locations
+		debug_print_memory();
+
 		/*
 		 * Short term preemptive scheduler.
 		 * Needs to be implemented!
@@ -128,7 +133,7 @@ int main(void)
 		execute_running_process();
 
 		// Check for interrupts and preemption
-		check_interrupts();
+		check_io_interrupt();
 
 		// Debugging print for the new and ready queues
 		debug_print_new_ready();

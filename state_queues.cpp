@@ -7,6 +7,7 @@
 
 #include "state_queues.h"
 
+int main_memory[MEM_SIZE];
 std::vector<PCB> new_queue;
 std::vector<PCB> ready_queue;
 std::vector<PCB> blocked_queue;

@@ -15,14 +15,5 @@ void new_process_arrival(PCB new_arrival);
 void long_term_scheduler();
 void execute_running_process();
 void process_exit();
-void check_interrupts();
-
-
-/*
- * Debugging functions.
- * Just how many of these will appear is yet to be seen.
- */
-void debug_print_new_ready();
-
 
 #endif /* LONG_TERM_SCHEDULER_H_ */

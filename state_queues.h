@@ -11,6 +11,18 @@
 #include "pcb.h"
 
 /*
+ * Main preprocessor definition of the memory size of the RAM
+ */
+#define MEM_SIZE 16
+
+/*
+ * main_memory array contains sixteen indexes, each representing
+ * one megabyte of memory. Each index will contain the process_id
+ * of the process occupying that megabyte of memory.
+ */
+extern int main_memory[MEM_SIZE];
+
+/*
  * Primary vectors of PCBs for the NEW and READY queue.
  */
 extern std::vector<PCB> new_queue;
@@ -29,7 +41,6 @@ extern std::vector<PCB> finished_list;
 
 /*
  * The main running process.
- * Possibly a better way to implement this.
  */
 extern PCB running_process;
 
