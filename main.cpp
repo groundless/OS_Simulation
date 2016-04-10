@@ -5,36 +5,14 @@
 // Description : Main OS
 //============================================================================
 
+#include "io_requests.h"
 #include "long_term_scheduler.h"
+#include "short_term_scheduler.h"
+#include "output_ui.h"
 
 
 // Temporary list of processes simulating arrival.
 std::vector<PCB> process_list;
-
-// Default constructor for the PCB
-PCB::PCB () {
-	process_id = -1;
-	state = "NULL";
-	total_runtime = 0;
-	elapsed_runtime = 0;
-	io_requests = 0;
-	io_completed = 0;
-	size = 0;
-}
-
-// Detailed constructor for PCB, needs all the information.
-PCB::PCB (int id, string s,
-		  int tr, int er,
-		  int ior, int ioc,
-		  int sz) {
-	process_id = id;
-	state = s;
-	total_runtime = tr;
-	elapsed_runtime = er;
-	io_requests = ior;
-	io_completed = ioc;
-	size = sz;
-}
 
 /*
  * Temporary debugging processes coming into the OS
@@ -92,11 +70,10 @@ int main(void)
 	initialize_memory();
 
 	/*
-	 * Two input processing options, one is manual and the other
-	 * auto-generates processes for ease of testing.
+	 * Temporary debugging process generation
+	 * See the above functions
 	 */
 
-	//begin_input_processing();
 	debug_input_processing();
 
 	/*
@@ -138,10 +115,14 @@ int main(void)
 		 * Simulates process arrival.
 		 */
 		long_term_scheduler();
+		hold_on_state_change();
+
+		// Debugging print for the main memory locations
+		debug_print_memory();
 
 		/*
 		 * Short term preemptive scheduler.
-		 * Needs to be implemented!
+		 * Needs to be implemented as Round Robin
 		 */
 		short_term_scheduler();
 
@@ -151,8 +132,8 @@ int main(void)
 		// Run the current process in the RUNNING state
 		execute_running_process();
 
-		// Check for interrupts and preemption
-		check_interrupts();
+		// Check for any interrupts
+		check_io_interrupt();
 
 		// Debugging print for the new and ready queues
 		debug_print_new_ready();
@@ -172,4 +153,14 @@ int main(void)
 	getline(cin, input);
 
 	return 0;
+}
+
+void hold_on_state_change() {
+	string input;
+	if (state_changed_flag) {
+		cout << "State has changed" << endl;
+		cout << "Press any key to continue" << endl;
+		getline(cin, input);
+		state_changed_flag = false;
+	}
 }
