@@ -26,7 +26,7 @@ void debug_input_processing() {
 	int runtime_min = 1;
 	int runtime_max = 100;
 	int io_min = 0;
-	int io_max = 5;
+	int io_max = 0;
 
 	srand(time(NULL));
 
@@ -115,7 +115,7 @@ int main(void)
 		 * Simulates process arrival.
 		 */
 		long_term_scheduler();
-		hold_on_state_change();
+		//hold_on_state_change();
 
 		// Debugging print for the main memory locations
 		debug_print_memory();
