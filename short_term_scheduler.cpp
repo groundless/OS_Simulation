@@ -17,9 +17,11 @@
 int round_robin_counter = 0;
 
 /*
- * Basically FCFS temporarily, also not fully working.
- * This should make use of debug statements, since getting a good implementation
- * working that we also know is working will take some time.
+ * "The short-term scheduler, also known as the dispatcher, executes most frequently
+ * and makes the fine-grained decisions of which process to execute next. The short-term
+ * scheduler is invoked whenever an event occurs that may lead to the blocking of the current
+ * process or that may provide an opportunity to preempt a currently running process in favor
+ * of another. Examples include - Clock Interrupts - I/O Interrupts" pg. 402 Stallings.
  */
 void short_term_scheduler () {
 
@@ -82,6 +84,7 @@ void short_term_scheduler () {
 		}
 
 		// Check if that process has finished yet
+		// Redundant check? This happens in the execute_running_process() function
 		if (running_process.runtime_remaining() == 0) {
 			if (DEBUG) cout << "DEBUG: (short_term_scheduler): Running Process has finished " << endl;
 

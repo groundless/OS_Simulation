@@ -26,7 +26,7 @@ void debug_input_processing() {
 	int runtime_min = 1;
 	int runtime_max = 100;
 	int io_min = 0;
-	int io_max = 0;
+	int io_max = 5;
 
 	srand(time(NULL));
 
@@ -122,7 +122,7 @@ int main(void)
 
 		/*
 		 * Short term preemptive scheduler.
-		 * Needs to be implemented as Round Robin
+		 * Implemented as Round Robin with a 10 cycle time slice.
 		 */
 		short_term_scheduler();
 
@@ -134,6 +134,9 @@ int main(void)
 
 		// Check for any interrupts
 		check_io_interrupt();
+
+		// Check active IO devices
+		process_io_devices();
 
 		// Debugging print for the new and ready queues
 		debug_print_new_ready();
