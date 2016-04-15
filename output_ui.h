@@ -13,4 +13,7 @@
 void debug_print_memory();
 void debug_print_new_ready();
 
+void clear_console();
+void initialize_console();
+
 #endif /* OUTPUT_UI_H_ */
