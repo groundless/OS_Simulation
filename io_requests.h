@@ -11,5 +11,6 @@
 #include "state_queues.h"
 
 void check_io_interrupt();
+void process_io_devices();
 
 #endif /* IO_REQUESTS_H_ */

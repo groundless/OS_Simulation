@@ -115,14 +115,14 @@ int main(void)
 		 * Simulates process arrival.
 		 */
 		long_term_scheduler();
-		hold_on_state_change();
+		//hold_on_state_change();
 
 		// Debugging print for the main memory locations
 		debug_print_memory();
 
 		/*
 		 * Short term preemptive scheduler.
-		 * Needs to be implemented as Round Robin
+		 * Implemented as Round Robin with a 10 cycle time slice.
 		 */
 		short_term_scheduler();
 
@@ -134,6 +134,9 @@ int main(void)
 
 		// Check for any interrupts
 		check_io_interrupt();
+
+		// Check active IO devices
+		process_io_devices();
 
 		// Debugging print for the new and ready queues
 		debug_print_new_ready();
