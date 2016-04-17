@@ -11,6 +11,7 @@
 #include "output_ui.h"
 
 
+
 // Temporary list of processes simulating arrival.
 std::vector<PCB> process_list;
 
@@ -26,7 +27,7 @@ void debug_input_processing() {
 	int runtime_min = 1;
 	int runtime_max = 100;
 	int io_min = 0;
-	int io_max = 5;
+	int io_max = 0;
 
 	srand(time(NULL));
 
@@ -61,11 +62,13 @@ PCB retrieve_next_process () {
  * to run to completion, i.e. slowly display the state
  * changes of the processes as the OS functions.
  */
-bool run_to_completion = false;
+bool run_to_completion = true;
 
 void hold_on_state_change() {
 	string input;
 	if (state_changed_flag && !run_to_completion) {
+		clear_console();
+		debug_print();
 		cout << "State has changed" << endl;
 		cout << "Press any key to continue: or type 'run' to run to completion." << endl;
 		getline(cin, input);
@@ -125,6 +128,7 @@ int main(void)
 	 * NOTE: This position will change, we will want to
 	 * allow the user to change this at ANY POINT.
 	 */
+	/*
 	cout << "Run OS to completion? (y or n):\n";
 	getline(cin, input);
 
@@ -136,6 +140,7 @@ int main(void)
 	// User echo initially to make sure we are reading input correctly.
 	cout << "You entered: " << input << endl << endl;
 	cout << "BEGINNING SIMULATION" << endl;
+	*/
 
 	do {
 
@@ -150,9 +155,6 @@ int main(void)
 		 * Simulates process arrival.
 		 */
 		long_term_scheduler(); hold_on_state_change();
-
-		// Debugging print for the main memory locations
-		debug_print_memory();
 
 		/*
 		 * Short term preemptive scheduler.
@@ -173,13 +175,27 @@ int main(void)
 		process_io_devices(); hold_on_state_change();
 
 		// Debugging print for the new and ready queues
-		debug_print_new_ready();
 
+		debug_print();
 
 		// User interaction
 		cout << "Type 'exit' to exit the program:\n";
 		cout << "Press enter to advance one clock cycle (this is temporary):\n>";
-		getline(cin, input);
+
+		if(run_to_completion != true){
+            getline(cin, input);
+		}
+		else if(new_queue.empty() && blocked_queue.empty() && running_process.check_state("NULL") && ready_queue.empty()){ // Also check if simulation is finished. If file is empty, and all queues are empty.
+            //Sleep for 2000 milliseconds
+            cout << "Simulation has finished" << endl;
+            input = "exit";
+
+		}
+        else{
+
+            Sleep(2000);
+        }
+
 		// User echo initially to make sure we are reading input correctly.
 		cout << "You entered: " << input << endl << endl;
 
