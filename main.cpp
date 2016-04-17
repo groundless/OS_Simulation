@@ -11,6 +11,7 @@
 #include "output_ui.h"
 
 
+
 // Temporary list of processes simulating arrival.
 std::vector<PCB> process_list;
 
@@ -26,7 +27,7 @@ void debug_input_processing() {
 	int runtime_min = 1;
 	int runtime_max = 100;
 	int io_min = 0;
-	int io_max = 5;
+	int io_max = 0;
 
 	srand(time(NULL));
 
@@ -56,9 +57,29 @@ PCB retrieve_next_process () {
 	return next_process;
 }
 
+/*
+ * Flag which indicates whether we are allowing the OS
+ * to run to completion, i.e. slowly display the state
+ * changes of the processes as the OS functions.
+ */
+bool run_to_completion = true;
+
+void hold_on_state_change() {
+	string input;
+	if (state_changed_flag && !run_to_completion) {
+		clear_console();
+		debug_print();
+		cout << "State has changed" << endl;
+		cout << "Press any key to continue: or type 'run' to run to completion." << endl;
+		getline(cin, input);
+		state_changed_flag = false;
+		if (input == "run") run_to_completion = true;
+	}
+}
+
 int main(void)
 {
-
+	initialize_console();
 	/*
 	 * Initially read in inputs and build processes
 	 * Run long term scheduler to put a few processes into NEW
@@ -102,29 +123,44 @@ int main(void)
 	string input = "";
 	int cycle_count = 0;
 
+	/*
+	 * Do we want to initially run to completion?
+	 * NOTE: This position will change, we will want to
+	 * allow the user to change this at ANY POINT.
+	 */
+	/*
+	cout << "Run OS to completion? (y or n):\n";
+	getline(cin, input);
+
+	// Temporary Logic and Display, CHANGE LATER
+	if (input == "y") run_to_completion = true;
+	else if (input == "n") run_to_completion = false;
+	else cout << "Wrong input: run_to_completion is false";
+
+	// User echo initially to make sure we are reading input correctly.
+	cout << "You entered: " << input << endl << endl;
+	cout << "BEGINNING SIMULATION" << endl;
+	*/
+
 	do {
 
 		/*
 		 * Check if any new processes have arrived first.
 		 * If no processes have arrived, only passes a NULL reference.
 		 */
-		new_process_arrival(retrieve_next_process());
+		new_process_arrival(retrieve_next_process()); hold_on_state_change();
 
 		/*
 		 * Long term FCFS scheduler
 		 * Simulates process arrival.
 		 */
-		long_term_scheduler();
-		//hold_on_state_change();
-
-		// Debugging print for the main memory locations
-		debug_print_memory();
+		long_term_scheduler(); hold_on_state_change();
 
 		/*
 		 * Short term preemptive scheduler.
 		 * Implemented as Round Robin with a 10 cycle time slice.
 		 */
-		short_term_scheduler();
+		short_term_scheduler(); hold_on_state_change();
 
 		// Increase cycle count of the fetch-execute-interrupt cycle
 		cycle_count++;
@@ -133,21 +169,37 @@ int main(void)
 		execute_running_process();
 
 		// Check for any interrupts
-		check_io_interrupt();
+		check_io_interrupt(); hold_on_state_change();
 
 		// Check active IO devices
-		process_io_devices();
+		process_io_devices(); hold_on_state_change();
 
 		// Debugging print for the new and ready queues
-		debug_print_new_ready();
 
+		debug_print();
 
 		// User interaction
 		cout << "Type 'exit' to exit the program:\n";
 		cout << "Press enter to advance one clock cycle (this is temporary):\n>";
-		getline(cin, input);
+
+		if(run_to_completion != true){
+            getline(cin, input);
+		}
+		else if(new_queue.empty() && blocked_queue.empty() && running_process.check_state("NULL") && ready_queue.empty()){ // Also check if simulation is finished. If file is empty, and all queues are empty.
+            //Sleep for 2000 milliseconds
+            cout << "Simulation has finished" << endl;
+            input = "exit";
+
+		}
+        else{
+
+            Sleep(2000);
+        }
+
 		// User echo initially to make sure we are reading input correctly.
 		cout << "You entered: " << input << endl << endl;
+
+		clear_console();
 
 	} while (input != "exit");
 
@@ -156,14 +208,4 @@ int main(void)
 	getline(cin, input);
 
 	return 0;
-}
-
-void hold_on_state_change() {
-	string input;
-	if (state_changed_flag) {
-		cout << "State has changed" << endl;
-		cout << "Press any key to continue" << endl;
-		getline(cin, input);
-		state_changed_flag = false;
-	}
 }

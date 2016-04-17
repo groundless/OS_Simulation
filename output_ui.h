@@ -9,8 +9,11 @@
 #define OUTPUT_UI_H_
 
 #include "state_queues.h"
+#include "windows.h"
 
-void debug_print_memory();
-void debug_print_new_ready();
+void debug_print();
+
+void clear_console();
+void initialize_console();
 
 #endif /* OUTPUT_UI_H_ */

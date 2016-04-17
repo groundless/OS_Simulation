@@ -40,6 +40,9 @@ void memory_allocate(PCB new_arrival)
 	{
 		if (DEBUG) cout << "(memory_allocate): ERROR Not enough memory for process " << PID << endl;
 	}
+
+	// Memory has been allocated, update UI.
+	state_changed_flag = true;
 }
 
 // 
@@ -66,6 +69,9 @@ void memory_deallocate(PCB finished_process)
 		i++;
 		j++;
 	}
+
+	// Memory has been deallocated, update UI.
+	state_changed_flag = true;
 }
 
 
@@ -79,6 +85,9 @@ void new_process_arrival(PCB new_arrival)
 
 	new_arrival.set_state("NEW");
 	new_queue.push_back(new_arrival);
+
+	// A new process enters the system, the display should now update.
+	state_changed_flag = true;
 }
 
 /*
@@ -112,9 +121,6 @@ void long_term_scheduler()
 		// Change the process to READY and move to the READY queue
 		next_process.set_state("READY");
 		ready_queue.push_back(next_process);
-
-		// Memory was allocated, and the process has moved from NEW->READY
-		state_changed_flag = true;
 	}
 }
 

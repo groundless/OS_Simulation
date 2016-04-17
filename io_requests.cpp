@@ -53,6 +53,11 @@ void check_io_interrupt () {
 		PCB null_process;
 		running_process = null_process;
 		running_process.set_state("NULL");
+
+
+		 // Process has an IO request, and the state has changed from
+		 // RUNNING to BLOCKED. Update the display.
+		state_changed_flag = true;
 	}
 
 /*
@@ -121,6 +126,10 @@ void process_io_devices() {
 				blocked_queue.erase(blocked_queue.begin() + i);
 				// Remove the IO device from the active list
 				io_devices_active.erase(io_devices_active.begin() + i);
+
+				// IO Request has been completed, and the process state has changed
+				// from BLOCKED to READY.
+				state_changed_flag = true;
 			}
 		}
 	}

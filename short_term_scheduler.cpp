@@ -55,6 +55,9 @@ void short_term_scheduler () {
 			round_robin_counter = 0;
 
 			if (DEBUG) cout << "DEBUG: (short_term_scheduler): put process: " << running_process.get_id() << " into running" << endl;
+
+			// A process has changed from READY to RUNNING, update the UI.
+			state_changed_flag = true;
 		}
 	}
 	else {
@@ -85,6 +88,7 @@ void short_term_scheduler () {
 
 		// Check if that process has finished yet
 		// Redundant check? This happens in the execute_running_process() function
+		// this may never actually execute, CHECK THIS DURING DEBUGGING
 		if (running_process.runtime_remaining() == 0) {
 			if (DEBUG) cout << "DEBUG: (short_term_scheduler): Running Process has finished " << endl;
 

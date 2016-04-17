@@ -47,7 +47,15 @@ extern PCB running_process;
 
 /*
  * boolean flag used to halt when a process state has changed.
- * implemented in accordance with the project specifications.
+ * implemented in accordance with the project specifications:
+ *
+ * "display should change each time one of the following occurs:
+ * a new process enters the system,
+ * a processes state changes,
+ * an I/O request is made,
+ * an I/O request is completed,
+ * memory is allocated or deallocated,
+ * or a process exits the system."
  */
 extern bool state_changed_flag;
 
