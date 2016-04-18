@@ -18,6 +18,56 @@
  * Print out the main_memory array visually.
  * For debugging purposes.
  */
+
+ void print_memory() {
+
+		cout << "Main Memory" << endl;
+		cout << "----------------------------" << endl;
+		for (int i = 0; i < 4; i++) {
+			//cout << "Main Memory " << i << ": PID " << main_memory[i] << endl;
+			cout << (i+1)    << ": " << main_memory[i] << "\t";
+			cout << (i+4)+1  << ": " << main_memory[i+4] << "\t";
+			cout << (i+8)+1  << ": " << main_memory[i+8] << "\t";
+			cout << (i+12)+1 << ": " << main_memory[i+12] << endl;
+		}
+		cout << "----------------------------" << endl;
+
+}
+
+/*
+ * Debugging function, prints out the processes in the NEW and READY queue.
+ */
+void print () {
+
+	print_memory();
+
+	unsigned int index;
+
+		cout << ": New Queue size is " << new_queue.size() << endl;
+		for (index = 0; index < new_queue.size(); index++) {
+			cout << ": New Queue - Process " << new_queue.at(index).get_id() << " size is: " << new_queue.at(index).get_size() << endl;
+		}
+		cout << ": Ready Queue size is " << ready_queue.size() << endl;
+		for (index = 0; index < ready_queue.size(); index++) {
+			cout << ": Ready Queue -  Process " << ready_queue.at(index).get_id() << " size is: " << ready_queue.at(index).get_size() << endl;
+		}
+
+		if (!running_process.check_state("NULL")) {
+			cout << ": Running process: " << running_process.get_id() << " CPU time needed to complete: " << running_process.get_elapsed_runtime() << endl;
+		}
+
+		cout << ": Blocked Queue size is " << blocked_queue.size() << endl;
+		for (index = 0; index < blocked_queue.size(); index++) {
+			cout << ": Blocked Queue -  Process " << blocked_queue.at(index).get_id() << " size is: " << blocked_queue.at(index).get_size() << endl;
+		}
+		if (!running_process.check_state("NULL")) {
+			cout << ": Running Process - " << running_process.get_id() << " size is " << running_process.get_size() << endl;
+		}
+
+}
+
+//START ORIGINAL DEBUGGING FUNCTIONS
+
 void debug_print_memory() {
 	if (DEBUG) {
 		cout << "Main Memory" << endl;
@@ -30,6 +80,19 @@ void debug_print_memory() {
 			cout << (i+12)+1 << ": " << main_memory[i+12] << endl;
 		}
 		cout << "----------------------------" << endl;
+	}
+	else{ //Redunant, just wanted to have ability to keep using debug so wrote normal code in original functions
+        cout << "Main Memory" << endl;
+		cout << "----------------------------" << endl;
+		for (int i = 0; i < 4; i++) {
+			//cout << "Main Memory " << i << ": PID " << main_memory[i] << endl;
+			cout << (i+1)    << ": " << main_memory[i] << "\t";
+			cout << (i+4)+1  << ": " << main_memory[i+4] << "\t";
+			cout << (i+8)+1  << ": " << main_memory[i+8] << "\t";
+			cout << (i+12)+1 << ": " << main_memory[i+12] << endl;
+		}
+		cout << "----------------------------" << endl;
+
 	}
 }
 
@@ -63,6 +126,58 @@ void debug_print () {
 			cout << "DEBUG: Running Process - " << running_process.get_id() << " size is " << running_process.get_size() << endl;
 		}
 	}
+	else {
+
+		cout << "New Queue size: " << new_queue.size() << endl;
+		cout << "----------------" << endl;
+		cout << "->";
+		for (index = 0; index < new_queue.size(); index++) {
+			cout << "[" << new_queue.at(index).get_id() << "]"<<" ";
+		}
+
+		cout << endl << endl;
+
+		cout << "Ready Queue size: " << ready_queue.size() << endl;
+		cout << "----------------" << endl;
+		cout << "->";
+		for (index = 0; index < ready_queue.size(); index++) {
+			cout << "[" << ready_queue.at(index).get_id() << "]"<<" ";
+		}
+
+		cout << endl << endl;
+
+        cout << "Running process: " << endl
+			<< "-----------------" << endl;
+        cout << "->";
+		if (!running_process.check_state("NULL")) {
+
+            cout
+            << "ID: " << running_process.get_id() <<" "<< endl
+            << "  CPU time needed to complete: " << running_process.runtime_remaining() << endl
+            << "  CPU time already used: " << running_process.get_elapsed_runtime() << endl
+            << "  IO requests fulfilled: " << running_process.get_io_completed() << "/" <<running_process.iorequests_remaining() + running_process.get_io_completed() << endl;
+
+		}
+		else {
+            cout << "No processes running" << endl;
+		}
+
+        cout << endl;
+
+		cout << "Blocked Queue size: " << blocked_queue.size() << endl;
+		cout << "----------------" << endl;
+		cout << "->";
+		for (index = 0; index < blocked_queue.size(); index++) {
+			cout << "[" << blocked_queue.at(index).get_id() << "]"<<" ";
+		}
+
+		cout << endl << endl;
+
+
+		if (!running_process.check_state("NULL")) {
+			cout << "Running Process - " << running_process.get_id() << " size is " << running_process.get_size() << endl;
+		}
+	}
 }
 
 void move_cursor (short x, short y) {
@@ -71,6 +186,9 @@ void move_cursor (short x, short y) {
 }
 
 void clear_console() {
+
+    //system("cls");
+
 	 HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	 COORD coord = {0, 0};
 	 DWORD count;
@@ -81,6 +199,7 @@ void clear_console() {
 		  FillConsoleOutputAttribute(hStdOut, csbi.wAttributes, csbi.dwSize.X * csbi.dwSize.Y, coord, &count );
 		  SetConsoleCursorPosition(hStdOut, coord);
 	 }
+
 }
 
 void initialize_console () {

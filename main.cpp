@@ -27,7 +27,7 @@ void debug_input_processing() {
 	int runtime_min = 1;
 	int runtime_max = 100;
 	int io_min = 0;
-	int io_max = 0;
+	int io_max = 5;
 
 	srand(time(NULL));
 
@@ -62,7 +62,7 @@ PCB retrieve_next_process () {
  * to run to completion, i.e. slowly display the state
  * changes of the processes as the OS functions.
  */
-bool run_to_completion = true;
+bool run_to_completion = false;
 
 void hold_on_state_change() {
 	string input;
@@ -73,7 +73,19 @@ void hold_on_state_change() {
 		cout << "Press any key to continue: or type 'run' to run to completion." << endl;
 		getline(cin, input);
 		state_changed_flag = false;
-		if (input == "run") run_to_completion = true;
+		if (input == "run"){
+            run_to_completion = true;
+
+		}
+	}
+    else if (state_changed_flag && run_to_completion){
+
+        clear_console();
+		debug_print();
+		cout << "State has changed" << endl;
+		state_changed_flag = false;
+		Sleep(2000);
+
 	}
 }
 
@@ -176,30 +188,28 @@ int main(void)
 
 		// Debugging print for the new and ready queues
 
-		debug_print();
+		///debug_print(); //Commented out since don't print every cycle, only one state change
 
 		// User interaction
 		cout << "Type 'exit' to exit the program:\n";
-		cout << "Press enter to advance one clock cycle (this is temporary):\n>";
+		///cout << "Press enter to advance one clock cycle (this is temporary):\n>";
 
-		if(run_to_completion != true){
-            getline(cin, input);
-		}
-		else if(new_queue.empty() && blocked_queue.empty() && running_process.check_state("NULL") && ready_queue.empty()){ // Also check if simulation is finished. If file is empty, and all queues are empty.
+
+		if(new_queue.empty() && blocked_queue.empty() && running_process.check_state("NULL") && ready_queue.empty()){ // Also check if simulation is finished. If file is empty, and all queues are empty.
             //Sleep for 2000 milliseconds
             cout << "Simulation has finished" << endl;
             input = "exit";
 
 		}
-        else{
+        /*else if(run_to_completion){
 
             Sleep(2000);
-        }
+        }*/
 
 		// User echo initially to make sure we are reading input correctly.
 		cout << "You entered: " << input << endl << endl;
 
-		clear_console();
+		///clear_console();
 
 	} while (input != "exit");
 

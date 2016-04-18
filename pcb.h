@@ -24,7 +24,7 @@ using std::iostream;
 using std::endl;
 
 // Used for various debugging functions, set to false on release
-#define DEBUG true
+#define DEBUG false
 
 /*
  * Main class definition for the PCB. Requires more detailed

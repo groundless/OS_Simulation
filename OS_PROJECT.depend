@@ -1,0 +1,48 @@
+# depslib dependency file v1.0
+1460753860 source:c:\users\ferdinand\desktop\os_project\os_project\io_requests.cpp
+	"io_requests.h"
+
+1460675224 c:\users\ferdinand\desktop\os_project\os_project\io_requests.h
+	"state_queues.h"
+
+1460753620 c:\users\ferdinand\desktop\os_project\os_project\state_queues.h
+	"pcb.h"
+
+1460976526 c:\users\ferdinand\desktop\os_project\os_project\pcb.h
+	<string>
+	<vector>
+	<iostream>
+	<sstream>
+	<time.h>
+	<stdlib.h>
+
+1460754672 source:c:\users\ferdinand\desktop\os_project\os_project\long_term_scheduler.cpp
+	"long_term_scheduler.h"
+
+1460065944 c:\users\ferdinand\desktop\os_project\os_project\long_term_scheduler.h
+	"state_queues.h"
+
+1461018343 source:c:\users\ferdinand\desktop\os_project\os_project\output_ui.cpp
+	"output_ui.h"
+	"Wincon.h"
+
+1460916387 c:\users\ferdinand\desktop\os_project\os_project\output_ui.h
+	"state_queues.h"
+	"windows.h"
+
+1460754380 source:c:\users\ferdinand\desktop\os_project\os_project\short_term_scheduler.cpp
+	"long_term_scheduler.h"
+	"short_term_scheduler.h"
+
+1460035760 c:\users\ferdinand\desktop\os_project\os_project\short_term_scheduler.h
+	"state_queues.h"
+
+1460068862 source:c:\users\ferdinand\desktop\os_project\os_project\state_queues.cpp
+	"state_queues.h"
+
+1461017481 source:c:\users\ferdinand\desktop\os_project\os_project\main.cpp
+	"io_requests.h"
+	"long_term_scheduler.h"
+	"short_term_scheduler.h"
+	"output_ui.h"
+
