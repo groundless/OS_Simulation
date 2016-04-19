@@ -13,48 +13,49 @@
 
 
 // Temporary list of processes simulating arrival.
-std::vector<PCB> process_list;
+//std::vector<PCB> process_list;
 
 /*
  * Temporary debugging processes coming into the OS
+ *
+ *void debug_input_processing() {
+ *	int num_processes;
+ *	int size_min = 1, size_max = 8;
+ *	//int arrival_min = 10, int arrival_max = 100;
+ *	int runtime_min = 10, runtime_max = 950;
+ *	int io_min = 0, io_max = 5;
+ *
+ *
+ *	int index;
+ *	for (index = 0; index < num_processes; index++) {
+ *		PCB next_process(
+ *				rand() % 99 + 1,
+ *				"NEW",
+ *				rand() % runtime_max + runtime_min,
+ *				0,
+ *				io_max,
+ *				io_min,
+ *				rand() % size_max + size_min);
+ *		process_list.push_back(next_process);
+ *	}
+ *}
  */
-void debug_input_processing() {
-	int num_processes = 10;
-	int size_min = 1;
-	int size_max = 8;
-	//int arrival_min = 10;
-	//int arrival_max = 100;
-	int runtime_min = 1;
-	int runtime_max = 100;
-	int io_min = 0;
-	int io_max = 0;
 
-	srand(time(NULL));
-
-	int index;
-	for (index = 0; index < num_processes; index++) {
-		PCB next_process(
-				rand() % 99 + 1,
-				"NEW",
-				rand() % runtime_max + runtime_min,
-				0,
-				io_max,
-				io_min,
-				rand() % size_max + size_min);
-		process_list.push_back(next_process);
-	}
-}
-
-PCB retrieve_next_process () {
-	PCB next_process;
-	next_process.set_state("NULL");
-	if (process_list.empty()) {
-		if (DEBUG){cout << "Process list is empty" << endl;}
+PCB retrieve_next_process (ifstream& inputFile) {
+	int PID = 0, runtime = 0, IO = 0, size = 0;
+	int IO_min = 0, elapsedTime = 0;
+	string state = "NEW";
+	if (!inputFile.eof()) {
+		inputFile >> PID >> runtime >> IO >> size;
+		PCB next_process(PID, state, runtime, elapsedTime, IO, IO_min, size);
 		return next_process;
 	}
-	next_process = process_list.back();
-	process_list.pop_back();
-	return next_process;
+	else{
+		if (DEBUG){cout << "Process list is empty" << endl;}
+		PCB next_process;
+		next_process.set_state("NULL");
+		return next_process;
+	}
 }
 
 /*
@@ -79,6 +80,14 @@ void hold_on_state_change() {
 
 int main(void)
 {
+	
+	ifstream inputProcesses;
+	inputProcesses.open("Processes.txt");
+	while(!inputProcesses.is_open()) {
+		cout << "ERROR: file Process.txt can not be opened. Please check that Process.txt is in the correct folder." << endl;
+		exit(0);
+	}
+	
 	initialize_console();
 	/*
 	 * Initially read in inputs and build processes
@@ -95,7 +104,7 @@ int main(void)
 	 * See the above functions
 	 */
 
-	debug_input_processing();
+	//debug_input_processing();
 
 	/*
 	 * Initial process arrival, the OS always starts with something running?
@@ -103,7 +112,7 @@ int main(void)
 	 * logic more apparent.
 	 */
 
-	new_process_arrival(retrieve_next_process());
+	new_process_arrival(retrieve_next_process(inputProcesses));
 
 
 	/* Fetch-execute-interrupt begins
@@ -148,7 +157,7 @@ int main(void)
 		 * Check if any new processes have arrived first.
 		 * If no processes have arrived, only passes a NULL reference.
 		 */
-		new_process_arrival(retrieve_next_process()); hold_on_state_change();
+		new_process_arrival(retrieve_next_process(inputProcesses));; hold_on_state_change();
 
 		/*
 		 * Long term FCFS scheduler
