@@ -11,7 +11,6 @@
 #include "output_ui.h"
 
 
-
 // Temporary list of processes simulating arrival.
 std::vector<PCB> process_list;
 
@@ -62,8 +61,7 @@ PCB retrieve_next_process () {
  * to run to completion, i.e. slowly display the state
  * changes of the processes as the OS functions.
  */
-bool run_to_completion = false;
-int step=0;
+bool run_to_completion = true;
 
 void hold_on_state_change() {
 	string input;
@@ -74,21 +72,7 @@ void hold_on_state_change() {
 		cout << "Press any key to continue: or type 'run' to run to completion." << endl;
 		getline(cin, input);
 		state_changed_flag = false;
-		if (input == "run"){
-            run_to_completion = true;
-            cout << "How Many Seconds Between Each Step (Enter an Integer): ";
-            cin >> step;
-
-		}
-	}
-    else if (state_changed_flag && run_to_completion){
-
-        clear_console();
-		debug_print();
-		cout << "State has changed" << endl;
-		state_changed_flag = false;
-		Sleep(step*1000);
-
+		if (input == "run") run_to_completion = true;
 	}
 }
 
@@ -191,28 +175,16 @@ int main(void)
 
 		// Debugging print for the new and ready queues
 
-		///debug_print(); //Commented out since don't print every cycle, only one state change
+		debug_print();
 
 		// User interaction
 		cout << "Type 'exit' to exit the program:\n";
-		///cout << "Press enter to advance one clock cycle (this is temporary):\n>";
-
-
-		if(new_queue.empty() && blocked_queue.empty() && running_process.check_state("NULL") && ready_queue.empty()){ // Also check if simulation is finished. If file is empty, and all queues are empty.
-            //Sleep for 2000 milliseconds
-            cout << "Simulation has finished" << endl;
-            input = "exit";
-
-		}
-        /*else if(run_to_completion){
-
-            Sleep(2000);
-        }*/
-
+		cout << "Press enter to advance one clock cycle (this is temporary):\n>";
+		getline(cin, input);
 		// User echo initially to make sure we are reading input correctly.
 		cout << "You entered: " << input << endl << endl;
 
-		///clear_console();
+		clear_console();
 
 	} while (input != "exit");
 
