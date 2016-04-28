@@ -24,7 +24,7 @@ using std::iostream;
 using std::endl;
 
 // Used for various debugging functions, set to false on release
-#define DEBUG true
+#define DEBUG false
 
 /*
  * Main class definition for the PCB. Requires more detailed
@@ -53,6 +53,8 @@ class PCB {
 	 * BLOCKED / EXIT / NULL
 	 */
 	string state;
+
+	string old_state;
 
 	/*
 	 * Between 10 - 950 cycles of 0.1 seconds
@@ -131,6 +133,8 @@ class PCB {
      * Must follow the convention defined above.
      */
     void set_state(string new_state) {state = new_state;}
+
+    void set_old_state(string new_state) {old_state = new_state;}
 
     /*
      * Simulates process execution, increases elapsed_runtime by one.

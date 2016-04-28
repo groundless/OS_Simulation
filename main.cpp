@@ -11,6 +11,7 @@
 #include "output_ui.h"
 
 
+
 // Temporary list of processes simulating arrival.
 std::vector<PCB> process_list;
 
@@ -61,18 +62,33 @@ PCB retrieve_next_process () {
  * to run to completion, i.e. slowly display the state
  * changes of the processes as the OS functions.
  */
-bool run_to_completion = true;
+bool run_to_completion = false;
+/*
+ * Step indicates the number of seconds to sleep between
+ * states updating. User specified.
+ */
+int step = 0;
 
 void hold_on_state_change() {
 	string input;
 	if (state_changed_flag && !run_to_completion) {
-		clear_console();
-		debug_print();
+		display_ui();
 		cout << "State has changed" << endl;
 		cout << "Press any key to continue: or type 'run' to run to completion." << endl;
 		getline(cin, input);
 		state_changed_flag = false;
-		if (input == "run") run_to_completion = true;
+		if (input == "run"){
+            run_to_completion = true;
+            cout << "How Many Seconds Between Each Step (Enter an Integer): ";
+            cin >> step;
+            cin.ignore(1000, '\n');
+		}
+	}
+    else if (state_changed_flag && run_to_completion) {
+		display_ui();
+		cout << "State has changed" << endl;
+		state_changed_flag = false;
+		Sleep(step*1000);
 	}
 }
 
@@ -104,61 +120,18 @@ int main(void)
 
 	new_process_arrival(retrieve_next_process());
 
-
-	/* Fetch-execute-interrupt begins
-	 * Wait 0.1 seconds to simulate the cycle
-	 * Process in RUN executes for a 0.1 cycle
-	 * Check for interrupts or preemption
-	 * If process is EXIT then run short term scheduler
-	 */
-
-	/*
-	 * The main do while loop for the program, which exits when the user inputs
-	 * 'exit' as a string to end the program. The string input is the main string
-	 * for processing user input, and cycle_count is a counter for how many cycles
-	 * have been looped.
-	 */
-
 	string input = "";
 	int cycle_count = 0;
 
-	/*
-	 * Do we want to initially run to completion?
-	 * NOTE: This position will change, we will want to
-	 * allow the user to change this at ANY POINT.
-	 */
-	/*
-	cout << "Run OS to completion? (y or n):\n";
-	getline(cin, input);
-
-	// Temporary Logic and Display, CHANGE LATER
-	if (input == "y") run_to_completion = true;
-	else if (input == "n") run_to_completion = false;
-	else cout << "Wrong input: run_to_completion is false";
-
-	// User echo initially to make sure we are reading input correctly.
-	cout << "You entered: " << input << endl << endl;
-	cout << "BEGINNING SIMULATION" << endl;
-	*/
-
 	do {
 
-		/*
-		 * Check if any new processes have arrived first.
-		 * If no processes have arrived, only passes a NULL reference.
-		 */
+		// Check if any new processes have arrived first. If no processes have arrived, only passes a NULL reference.
 		new_process_arrival(retrieve_next_process()); hold_on_state_change();
 
-		/*
-		 * Long term FCFS scheduler
-		 * Simulates process arrival.
-		 */
+		// Long term First Come First Serve scheduler
 		long_term_scheduler(); hold_on_state_change();
 
-		/*
-		 * Short term preemptive scheduler.
-		 * Implemented as Round Robin with a 10 cycle time slice.
-		 */
+		// Short term preemptive scheduler. Implemented as Round Robin with a 10 cycle time slice.
 		short_term_scheduler(); hold_on_state_change();
 
 		// Increase cycle count of the fetch-execute-interrupt cycle
@@ -173,24 +146,16 @@ int main(void)
 		// Check active IO devices
 		process_io_devices(); hold_on_state_change();
 
-		// Debugging print for the new and ready queues
-
-		debug_print();
-
-		// User interaction
-		cout << "Type 'exit' to exit the program:\n";
-		cout << "Press enter to advance one clock cycle (this is temporary):\n>";
-		getline(cin, input);
-		// User echo initially to make sure we are reading input correctly.
-		cout << "You entered: " << input << endl << endl;
-
-		clear_console();
+		// Also check if simulation is finished. If file is empty, and all queues are empty.
+		if (new_queue.empty() && blocked_queue.empty() && running_process.check_state("NULL") && ready_queue.empty()) {
+            cout << "OS Simulation has finished" << endl;
+            input = "exit";
+		}
 
 	} while (input != "exit");
 
-	cout << "System exiting\n";
-	// User must press a key to exit
+	hold_on_state_change();
+	cout << "Press any key to exit" << endl;
 	getline(cin, input);
-
 	return 0;
 }
