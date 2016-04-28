@@ -19,53 +19,6 @@
  * For debugging purposes.
  */
 
- void print_memory() {
-
-		cout << "Main Memory" << endl;
-		cout << "----------------------------" << endl;
-		for (int i = 0; i < 4; i++) {
-			//cout << "Main Memory " << i << ": PID " << main_memory[i] << endl;
-			cout << (i+1)    << ": " << main_memory[i] << "\t";
-			cout << (i+4)+1  << ": " << main_memory[i+4] << "\t";
-			cout << (i+8)+1  << ": " << main_memory[i+8] << "\t";
-			cout << (i+12)+1 << ": " << main_memory[i+12] << endl;
-		}
-		cout << "----------------------------" << endl;
-
-}
-
-/*
- * Debugging function, prints out the processes in the NEW and READY queue.
- */
-void print () {
-
-	print_memory();
-
-	unsigned int index;
-
-		cout << ": New Queue size is " << new_queue.size() << endl;
-		for (index = 0; index < new_queue.size(); index++) {
-			cout << ": New Queue - Process " << new_queue.at(index).get_id() << " size is: " << new_queue.at(index).get_size() << endl;
-		}
-		cout << ": Ready Queue size is " << ready_queue.size() << endl;
-		for (index = 0; index < ready_queue.size(); index++) {
-			cout << ": Ready Queue -  Process " << ready_queue.at(index).get_id() << " size is: " << ready_queue.at(index).get_size() << endl;
-		}
-
-		if (!running_process.check_state("NULL")) {
-			cout << ": Running process: " << running_process.get_id() << " CPU time needed to complete: " << running_process.get_elapsed_runtime() << endl;
-		}
-
-		cout << ": Blocked Queue size is " << blocked_queue.size() << endl;
-		for (index = 0; index < blocked_queue.size(); index++) {
-			cout << ": Blocked Queue -  Process " << blocked_queue.at(index).get_id() << " size is: " << blocked_queue.at(index).get_size() << endl;
-		}
-		if (!running_process.check_state("NULL")) {
-			cout << ": Running Process - " << running_process.get_id() << " size is " << running_process.get_size() << endl;
-		}
-
-}
-
 //START ORIGINAL DEBUGGING FUNCTIONS
 
 void debug_print_memory() {
@@ -81,9 +34,36 @@ void debug_print_memory() {
 		}
 		cout << "----------------------------" << endl;
 	}
-	else{ //Redunant, just wanted to have ability to keep using debug so wrote normal code in original functions
+	else{
         cout << "Main Memory" << endl;
-		cout << "----------------------------" << endl;
+		cout << endl;
+
+        //Adjusts spacing for indexes with 1 vs 2 numbers (eg. 7 vs 12)
+		for(int i = 0; i < 16; i++){
+
+            if((i+1) < 10){
+                cout <<"  "<< (i+1)<<"  ";
+            }
+            else{
+                cout <<" " <<(i+1)<<"  ";
+            }
+		}
+
+        cout << endl << "--------------------------------------------------------------------------------" << endl;
+
+		for(int i = 0; i < 16; i++){
+
+            if(main_memory[i] < 10){
+                cout << " " << "0" << main_memory[i] << " |";
+            }
+            else {
+                cout << " " << main_memory[i] << " |";
+            }
+		}
+
+        cout << endl << "--------------------------------------------------------------------------------" << endl << endl;
+
+	/*
 		for (int i = 0; i < 4; i++) {
 			//cout << "Main Memory " << i << ": PID " << main_memory[i] << endl;
 			cout << (i+1)    << ": " << main_memory[i] << "\t";
@@ -92,7 +72,7 @@ void debug_print_memory() {
 			cout << (i+12)+1 << ": " << main_memory[i+12] << endl;
 		}
 		cout << "----------------------------" << endl;
-
+    */
 	}
 }
 
@@ -100,8 +80,6 @@ void debug_print_memory() {
  * Debugging function, prints out the processes in the NEW and READY queue.
  */
 void debug_print () {
-
-	debug_print_memory();
 
 	unsigned int index;
 	if (DEBUG) {
@@ -145,6 +123,8 @@ void debug_print () {
 		}
 
 		cout << endl << endl;
+
+        debug_print_memory();
 
         cout << "Running process: " << endl
 			<< "-----------------" << endl;

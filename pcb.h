@@ -54,6 +54,8 @@ class PCB {
 	 */
 	string state;
 
+	string old_state;
+
 	/*
 	 * Between 10 - 950 cycles of 0.1 seconds
 	 */
@@ -131,6 +133,8 @@ class PCB {
      * Must follow the convention defined above.
      */
     void set_state(string new_state) {state = new_state;}
+
+    void set_old_state(string new_state) {old_state = new_state;}
 
     /*
      * Simulates process execution, increases elapsed_runtime by one.

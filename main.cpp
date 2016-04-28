@@ -63,6 +63,7 @@ PCB retrieve_next_process () {
  * changes of the processes as the OS functions.
  */
 bool run_to_completion = false;
+int step=0;
 
 void hold_on_state_change() {
 	string input;
@@ -75,6 +76,8 @@ void hold_on_state_change() {
 		state_changed_flag = false;
 		if (input == "run"){
             run_to_completion = true;
+            cout << "How Many Seconds Between Each Step (Enter an Integer): ";
+            cin >> step;
 
 		}
 	}
@@ -84,7 +87,7 @@ void hold_on_state_change() {
 		debug_print();
 		cout << "State has changed" << endl;
 		state_changed_flag = false;
-		Sleep(2000);
+		Sleep(step*1000);
 
 	}
 }
