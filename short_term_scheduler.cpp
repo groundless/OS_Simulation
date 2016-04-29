@@ -56,6 +56,10 @@ void short_term_scheduler () {
 
 			if (DEBUG) cout << "DEBUG: (short_term_scheduler): put process: " << running_process.get_id() << " into running" << endl;
 
+
+            state_changed_string = "State changed for process " + running_process.get_string_id() + " changed from state READY to the RUNNING state";
+            //Set state to running
+            running_process.set_state("RUNNING");
 			// A process has changed from READY to RUNNING, update the UI.
 			state_changed_flag = true;
 		}
@@ -75,6 +79,10 @@ void short_term_scheduler () {
 
 			// Should we issue an interrupt? (This would be more in line with a real OS)
 			ready_queue.push_back(running_process);
+
+            state_changed_string = "State changed for process " + running_process.get_string_id() + " changed from state RUNNING TO READY";
+
+            state_changed_flag = true;
 
 			// Set running_process to null;
 			PCB null_process;

@@ -22,7 +22,7 @@ void initialize_memory()
 }
 
 //
-// New processes are allocated memory in the main_memory array. 
+// New processes are allocated memory in the main_memory array.
 //
 void memory_allocate(PCB new_arrival)
 {
@@ -45,9 +45,9 @@ void memory_allocate(PCB new_arrival)
 	state_changed_flag = true;
 }
 
-// 
-// Processes that are finished running have their memory removed. 
-// Remaining memory is then shifted down. 
+//
+// Processes that are finished running have their memory removed.
+// Remaining memory is then shifted down.
 //
 void memory_deallocate(PCB finished_process)
 {
@@ -83,6 +83,8 @@ void new_process_arrival(PCB new_arrival)
 	if (new_arrival.check_state("NULL"))
 		return;
 
+    state_changed_string = "State changed for process " + new_arrival.get_string_id() + " changed from state " + new_arrival.get_state() + " to the NEW state";
+
 	new_arrival.set_state("NEW");
 	new_queue.push_back(new_arrival);
 
@@ -117,6 +119,8 @@ void long_term_scheduler()
 
 		// Remove the process from the NEW queue
 		new_queue.erase(new_queue.begin());
+
+        state_changed_string = "State changed for process " + next_process.get_string_id() + " changed from state " + next_process.get_state() + " to the READY state";
 
 		// Change the process to READY and move to the READY queue
 		next_process.set_state("READY");

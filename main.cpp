@@ -70,7 +70,8 @@ void hold_on_state_change() {
 	if (state_changed_flag && !run_to_completion) {
 		clear_console();
 		debug_print();
-		cout << "State has changed" << endl;
+		//cout << "State has changed" << endl;
+		cout << state_changed_string <<endl;
 		cout << "Press any key to continue: or type 'run' to run to completion." << endl;
 		getline(cin, input);
 		state_changed_flag = false;

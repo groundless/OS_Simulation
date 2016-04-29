@@ -8,6 +8,7 @@
 #ifndef PCB_H_
 #define PCB_H_
 
+
 #include <string>
 #include <vector>
 #include <iostream>
@@ -22,6 +23,18 @@ using std::basic_istream;
 using std::basic_iostream;
 using std::iostream;
 using std::endl;
+
+namespace patch
+{
+    template < typename T > std::string to_string( const T& n )
+    {
+        std::ostringstream stm ;
+        stm << n ;
+        return stm.str() ;
+    }
+}
+
+//using namespace patch;
 
 // Used for various debugging functions, set to false on release
 #define DEBUG false
@@ -112,6 +125,13 @@ class PCB {
      * Returns the process_id
      */
     int get_id() {return process_id;}
+
+    //Return string id
+    string get_string_id() {return patch::to_string(process_id);}
+
+    //Returns the state
+    string get_state() {return state;}
+
 
     /*
      * Returns the process size

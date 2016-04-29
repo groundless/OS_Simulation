@@ -14,3 +14,4 @@ std::vector<PCB> blocked_queue;
 std::vector<PCB> finished_list;
 PCB running_process;
 bool state_changed_flag = false;
+string state_changed_string;

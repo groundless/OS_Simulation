@@ -156,6 +156,7 @@ void debug_print () {
 
 		if (!running_process.check_state("NULL")) {
 			cout << "Running Process - " << running_process.get_id() << " size is " << running_process.get_size() << endl;
+            ///This may be in the wrong place
 		}
 	}
 }

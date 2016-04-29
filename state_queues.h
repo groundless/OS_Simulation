@@ -59,4 +59,6 @@ extern PCB running_process;
  */
 extern bool state_changed_flag;
 
+extern string state_changed_string;
+
 #endif /* STATE_QUEUES_ */

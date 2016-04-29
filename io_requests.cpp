@@ -36,6 +36,10 @@ void check_io_interrupt () {
 
 		if (DEBUG) cout << "DEBUG: (check_interupts): Running Process has an IO Request " << endl;
 
+        state_changed_string = "State changed for process " + running_process.get_string_id() + " changed from state " + running_process.get_state() + " to the BLOCKED state";
+
+        state_changed_flag = true;
+
 		// Indicate that the running process is now BLOCKED
 		// Blocked processes remain in main memory
 		running_process.set_state("BLOCKED");
@@ -117,6 +121,11 @@ void process_io_devices() {
 
 				// Simulate completion of the IO request
 				blocked_queue.at(i).finish_iorequest();
+
+                //Output state changed Blocked-Ready
+                state_changed_string = "State changed for process " + patch::to_string(blocked_queue.at(i).get_id()) + " changed from state BLOCKED to the READY state";
+
+                state_changed_flag = true;
 
 				// Move the process back onto the end of the Ready Queue
 				// State change BLOCKED->READY
