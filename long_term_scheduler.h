@@ -1,8 +1,7 @@
 //============================================================================
 // Name        : long_term_scheduler.h
-// Author      :
-// Version     : 0.01
-// Description : Long term scheduling bringing processes into NEW and NEW->READY
+// Description : Contains functions for the long term scheduler, memory
+//               management, process execution, process arrival and exiting.
 //============================================================================
 
 #ifndef LONG_TERM_SCHEDULER_H_

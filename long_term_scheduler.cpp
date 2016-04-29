@@ -1,17 +1,15 @@
 //============================================================================
 // Name		   : long_term_scheduler.cpp
-// Author	   :
-// Version	   :
-// Description : Source file for long term scheduler
+// Description : Source file for long term scheduler.
 //============================================================================
 
 #include "long_term_scheduler.h"
 
+// Used to determine whether memory is available for a process.
 int available_memory;
 
-/*
- * Basic initializations go here to keep the code clean.
- */
+
+// Basic initializations go here to keep the code clean.
 void initialize_memory()
 {
 	available_memory = MEM_SIZE;
@@ -36,13 +34,8 @@ void memory_allocate(PCB new_arrival)
 	if((MEM_SIZE - free_memory) >= requested_memory)
 		for(int i = free_memory; i < free_memory + requested_memory; i++)
 			main_memory[i] = PID;
-	else
-	{
-		if (DEBUG) cout << "(memory_allocate): ERROR Not enough memory for process " << PID << endl;
-	}
 
-	// Memory has been allocated, update UI.
-	state_changed_flag = true;
+	else if (DEBUG) cout << "(memory_allocate): ERROR Not enough memory for process " << PID << endl;
 }
 
 // 
@@ -69,15 +62,8 @@ void memory_deallocate(PCB finished_process)
 		i++;
 		j++;
 	}
-
-	// Memory has been deallocated, update UI.
-	state_changed_flag = true;
 }
 
-
-/*
- * Simulates the arrival of a new process into the OS.
- */
 void new_process_arrival(PCB new_arrival)
 {
 	if (new_arrival.check_state("NULL"))
@@ -88,11 +74,13 @@ void new_process_arrival(PCB new_arrival)
 
 	// A new process enters the system, the display should now update.
 	state_changed_flag = true;
+	stringstream ss;
+	ss << "Process [" << new_arrival.get_id() << "] has entered the system and has moved to the New queue.";
+	state_changed_description = ss.str();
 }
 
-/*
- * Uses FCFS to simulate process arrival.
- */
+
+// Uses FCFS to simulate process arrival.
 void long_term_scheduler()
 {
 	// If there is nothing is the NEW queue, then no decisions are to be made.
@@ -118,21 +106,28 @@ void long_term_scheduler()
 		// Remove the process from the NEW queue
 		new_queue.erase(new_queue.begin());
 
-		// Change the process to READY and move to the READY queue
+		// Change the process from NEW to READY, and move to the READY queue.
 		next_process.set_state("READY");
 		ready_queue.push_back(next_process);
+
+		// Update state flag and description for the UI.
+		state_changed_flag = true;
+		stringstream ss;
+		ss << "Process [" << next_process.get_id() << "] has been allocated memory and has moved from New to Ready.";
+		state_changed_description = ss.str();
 	}
 }
 
-/*
- * Increments elapsed time of the current RUNNING process.
- */
+// Increments elapsed time of the current RUNNING process.
+// Also checks if the process running time has completed.
+// The long term scheduler will run again via the main loop.
 void execute_running_process () {
 	if (running_process.check_state("NULL")) {
 		if (DEBUG) cout << "DEBUG: (execute_running_process): No currently running process" << endl;
 		return;
 	}
 	running_process.execute_instruction();
+
 	if (DEBUG) cout << "DEBUG: (execute_running_process): Running Process remaining time to complete: " << running_process.runtime_remaining() << endl;
 
 	if (running_process.runtime_remaining() == 0) {
@@ -141,15 +136,10 @@ void execute_running_process () {
 	}
 }
 
-/*
- * Running -> Exit
- * Remove process from main memory, place in some kind of finished queue?
- * Finished queue for tracking or debugging purposes?
- */
 
+// Running -> Exit
 void process_exit() {
 
-	// Deallocate memory from the process
 	memory_deallocate(running_process);
 	available_memory += running_process.get_size();
 
@@ -160,6 +150,11 @@ void process_exit() {
 	// May not be necessary, but useful for debugging later
 	PCB finished_process = running_process;
 	finished_list.push_back(finished_process);
+
+	state_changed_flag = true;
+	stringstream ss;
+	ss << "Process [" << finished_process.get_id() << "] has finished running and has moved from Running to Exit.";
+	state_changed_description = ss.str();
 
 	// Running process is now NULL
 	PCB null_process;

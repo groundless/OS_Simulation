@@ -1,8 +1,6 @@
 //============================================================================
-// Name		   : interrupts.cpp
-// Author	   :
-// Version	   :
-// Description : Function declarations for the IO
+// Name		   : output_ui.cpp
+// Description : User Interface functions.
 //============================================================================
 
 #include "output_ui.h"
@@ -81,7 +79,7 @@ void display_ui () {
         cout << "No processes running" << endl;
 	}
 
-    cout << endl;
+    cout << endl << endl;
 
 	cout << "Blocked Queue size: " << blocked_queue.size() << endl;
 	cout << "----------------" << endl;
@@ -89,13 +87,9 @@ void display_ui () {
 	for (index = 0; index < blocked_queue.size(); index++) {
 		cout << "[" << blocked_queue.at(index).get_id() << "]"<<" ";
 	}
+	cout << endl << endl << endl;
 
-	cout << endl << endl;
-
-
-	if (!running_process.check_state("NULL")) {
-		cout << "Running Process - " << running_process.get_id() << " size is " << running_process.get_size() << endl;
-	}
+	cout << state_changed_description << endl;
 }
 
 /*

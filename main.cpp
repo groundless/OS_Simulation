@@ -1,8 +1,6 @@
 //============================================================================
 // Name        : main.cpp
-// Author      :
-// Version     : 0.03
-// Description : Main OS
+// Description : Main OS Simulation file.
 //============================================================================
 
 #include "io_requests.h"
@@ -73,20 +71,21 @@ void hold_on_state_change() {
 	string input;
 	if (state_changed_flag && !run_to_completion) {
 		display_ui();
-		cout << "State has changed" << endl;
-		cout << "Press any key to continue: or type 'run' to run to completion." << endl;
+		cout << "Press the enter key to continue, or type 'run' to run to completion. " << endl;
 		getline(cin, input);
 		state_changed_flag = false;
 		if (input == "run"){
             run_to_completion = true;
-            cout << "How Many Seconds Between Each Step (Enter an Integer): ";
+            cout << "How many seconds between each step? Enter a positive integer: ";
             cin >> step;
             cin.ignore(1000, '\n');
+		}
+		else if (input == "exit") {
+			exit(0);
 		}
 	}
     else if (state_changed_flag && run_to_completion) {
 		display_ui();
-		cout << "State has changed" << endl;
 		state_changed_flag = false;
 		Sleep(step*1000);
 	}
@@ -128,25 +127,25 @@ int main(void)
 		// Check if any new processes have arrived first. If no processes have arrived, only passes a NULL reference.
 		new_process_arrival(retrieve_next_process()); hold_on_state_change();
 
-		// Long term First Come First Serve scheduler
+		// Long term scheduler. Implemented as First Come First Serve.
 		long_term_scheduler(); hold_on_state_change();
 
 		// Short term preemptive scheduler. Implemented as Round Robin with a 10 cycle time slice.
 		short_term_scheduler(); hold_on_state_change();
 
-		// Increase cycle count of the fetch-execute-interrupt cycle
+		// Increase cycle count to keep track of the number of cycles executed.
 		cycle_count++;
 
-		// Run the current process in the RUNNING state
-		execute_running_process();
+		// Run the current process in the RUNNING state.
+		execute_running_process(); hold_on_state_change();
 
-		// Check for any interrupts
+		// Check for any interrupts from the currently running process.
 		check_io_interrupt(); hold_on_state_change();
 
 		// Check active IO devices
 		process_io_devices(); hold_on_state_change();
 
-		// Also check if simulation is finished. If file is empty, and all queues are empty.
+		// Check if the simulation is finished. If process file is empty, and all queues are empty.
 		if (new_queue.empty() && blocked_queue.empty() && running_process.check_state("NULL") && ready_queue.empty()) {
             cout << "OS Simulation has finished" << endl;
             input = "exit";

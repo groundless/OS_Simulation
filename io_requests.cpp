@@ -49,15 +49,17 @@ void check_io_interrupt () {
 		io_cycle_count = rand() % 25 + 25;
 		io_devices_active.push_back(io_cycle_count);
 
+		 // Process has an IO request, and the state has changed from
+		 // RUNNING to BLOCKED. Update the display.
+		state_changed_flag = true;
+		stringstream ss;
+		ss << "Process [" << running_process.get_id() << "] has an IO request and has moved from Running to Blocked.";
+		state_changed_description = ss.str();
+
 		// Currently no running process, set running process to NULL
 		PCB null_process;
 		running_process = null_process;
 		running_process.set_state("NULL");
-
-
-		 // Process has an IO request, and the state has changed from
-		 // RUNNING to BLOCKED. Update the display.
-		state_changed_flag = true;
 	}
 
 /*
@@ -108,6 +110,7 @@ void process_io_devices() {
 
 			// Each IO device decreases its counter until finished, for every execution cycle.
 			io_devices_active.at(i)--;
+
 			if (DEBUG) cout << "DEBUG: (process_io_devices): Process " << blocked_queue.at(i).get_id() << " has " << io_devices_active.at(i) << " IO cycles left until completion." << endl;
 
 			// Now check if the IO device has completed
@@ -122,14 +125,17 @@ void process_io_devices() {
 				// State change BLOCKED->READY
 				ready_queue.push_back(blocked_queue.at(i));
 
+				// IO Request has been completed, and the process state has changed
+				// from BLOCKED to READY.
+				state_changed_flag = true;
+				stringstream ss;
+				ss << "Process [" << blocked_queue.at(i).get_id() << "] has completed an IO request and has moved from Blocked to Ready.";
+				state_changed_description = ss.str();
+
 				// Remove the process from the blocked queue
 				blocked_queue.erase(blocked_queue.begin() + i);
 				// Remove the IO device from the active list
 				io_devices_active.erase(io_devices_active.begin() + i);
-
-				// IO Request has been completed, and the process state has changed
-				// from BLOCKED to READY.
-				state_changed_flag = true;
 			}
 		}
 	}

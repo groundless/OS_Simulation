@@ -1,8 +1,6 @@
 //============================================================================
 // Name        : short_term_scheduler.h
-// Author      :
-// Version     : 0.01
-// Description : Short term scheduling bringing processes READY to RUNNING
+// Description : Contains the short term scheduler function.
 //============================================================================
 
 #ifndef SHORT_TERM_SCHEDULER_H_
