@@ -10,53 +10,11 @@
 #include "short_term_scheduler.h"
 #include "output_ui.h"
 
-
-
-// Temporary list of processes simulating arrival.
-//std::vector<PCB> process_list;
-
 /*
- * Temporary debugging processes coming into the OS
- *
- *void debug_input_processing() {
- *	int num_processes;
- *	int size_min = 1, size_max = 8;
- *	//int arrival_min = 10, int arrival_max = 100;
- *	int runtime_min = 10, runtime_max = 950;
- *	int io_min = 0, io_max = 5;
- *
- *
- *	int index;
- *	for (index = 0; index < num_processes; index++) {
- *		PCB next_process(
- *				rand() % 99 + 1,
- *				"NEW",
- *				rand() % runtime_max + runtime_min,
- *				0,
- *				io_max,
- *				io_min,
- *				rand() % size_max + size_min);
- *		process_list.push_back(next_process);
- *	}
- *}
+ * Placeholder for description
  */
-
-PCB retrieve_next_process (ifstream& inputFile) {
-	int PID = 0, runtime = 0, IO = 0, size = 0;
-	int IO_min = 0, elapsedTime = 0;
-	string state = "NEW";
-	if (!inputFile.eof()) {
-		inputFile >> PID >> runtime >> IO >> size;
-		PCB next_process(PID, state, runtime, elapsedTime, IO, IO_min, size);
-		return next_process;
-	}
-	else{
-		if (DEBUG){cout << "Process list is empty" << endl;}
-		PCB next_process;
-		next_process.set_state("NULL");
-		return next_process;
-	}
-}
+PCB retrieve_next_process (ifstream& inputFile);
+void check_file(ifstream& inputFile);
 
 /*
  * Flag which indicates whether we are allowing the OS
@@ -80,6 +38,12 @@ void hold_on_state_change() {
 
 int main(void)
 {
+	srand(time(NULL));
+
+	/*
+	 * Creates a stream and checks to see if the Processes.txt file exists.
+	 * If it doesn't, the program returns an error and will exit.
+	*/
 	
 	ifstream inputProcesses;
 	inputProcesses.open("Processes.txt");
@@ -87,6 +51,10 @@ int main(void)
 		cout << "ERROR: file Process.txt can not be opened. Please check that Process.txt is in the correct folder." << endl;
 		exit(0);
 	}
+	
+	//Checks the Processes.txt file for any errors in formatting
+
+	check_file(inputProcesses);
 	
 	initialize_console();
 	/*
@@ -98,13 +66,6 @@ int main(void)
 	 */
 
 	initialize_memory();
-
-	/*
-	 * Temporary debugging process generation
-	 * See the above functions
-	 */
-
-	//debug_input_processing();
 
 	/*
 	 * Initial process arrival, the OS always starts with something running?
@@ -218,3 +179,97 @@ int main(void)
 
 	return 0;
 }
+
+PCB retrieve_next_process (ifstream& inputFile) {
+	int PID = 0, runtime = 0, IO = 0, size = 0, IO_min = 0, elapsedTime = 0;
+	static int cycleCount = 0, arrival = 0;
+	static bool empty_list = false;
+	string state = "NEW";
+	if(!empty_list){
+		if (arrival == 0){
+			arrival = rand() % (475-5+1)+5;
+			cycleCount++;
+		}else if(cycleCount == arrival){
+			arrival = 0;
+			cycleCount = 0;
+			if (!inputFile.eof()) {
+				inputFile >> PID >> runtime >> IO >> size;
+				PCB next_process(PID, state, runtime, elapsedTime, IO, IO_min, size);
+				return next_process;
+			}
+			if (DEBUG){cout << "Process list is empty" << endl;}
+			empty_list = true;
+		}else{
+			cycleCount++;
+		}
+	}
+	PCB next_process;
+	next_process.set_state("NULL");
+	return next_process;
+}
+
+void check_file(ifstream& inputFile){
+	string line; int line_piece;
+	int pid, runtime, io, size, on_line, count = 0;
+	std::vector<int> check_duplicates;
+	while(!inputFile.eof()){
+		on_line = 0;
+		getline(inputFile,line);
+		istringstream seperate(line);
+		while(seperate >> line_piece){
+			on_line++;
+			switch(on_line){
+				case 1:
+					pid = line_piece;
+					check_duplicates.push_back(pid);
+					break;
+				case 2:
+					runtime = line_piece;
+					if(runtime > 950 || runtime < 10){
+						cout << "ERROR: Process on line " << count+1 << "has an incorrect runtime value. Please make sure that the Processes.txt file follows the correct format and try again." << endl;
+						exit(0);
+					}
+					break;
+				case 3:
+					io = line_piece;
+					if(io > 5 || runtime < 0){
+						cout << "ERROR: Process on line " << count+1 << "has an incorrect IO value. Please make sure that the Processes.txt file follows the correct format and try again." << endl;
+						exit(0);
+					}
+					break;
+				case 4:
+					size = line_piece;
+					if(size > 8 || runtime < 1){
+						cout << "ERROR: Process on line " << count+1 << "has an incorrect size value. Please make sure that the Processes.txt file follows the correct format and try again." << endl;
+						exit(0);
+					}
+					break;
+			}
+		}
+		count++;
+		if(on_line != 4){
+			cout << "ERROR: Not enough entries on line " << count << ". Please make sure that the Processes.txt file follows the correct format and try again." << endl;
+			exit(0);
+		}
+	}
+	inputFile.clear();
+	inputFile.seekg(0, inputFile.beg);
+	for (std::vector<int>::iterator i = check_duplicates.begin(); i != check_duplicates.end(); ++i){
+		for (std::vector<int>::iterator j = i; j != check_duplicates.end(); ++j){
+			if(*i == *j){
+				cout << "ERROR: At least one pair of non-unique PIDs." << endl;
+				exit(0);
+			}
+		}
+	}
+	if(count < 10){
+		cout << "ERROR: too few processes in Processes.txt. Please make sure there are at least 10 processes in the file." << endl;
+		exit(0);
+	}else if(count > 60){
+		cout << "ERROR: too many processes in Processes.txt. Please make sure there are no more than 60 processes in the file." << endl;
+		exit(0);
+	}
+	return;
+}
+
+

@@ -8,11 +8,13 @@
 #ifndef PCB_H_
 #define PCB_H_
 
+#include <fstream>
 #include <string>
 #include <vector>
 #include <iostream>
 #include <sstream>
 #include <time.h>
+#include <stdio.h>
 #include <stdlib.h>
 using std::string;
 using std::cout;
@@ -21,7 +23,10 @@ using std::stringstream;
 using std::basic_istream;
 using std::basic_iostream;
 using std::iostream;
+using std::ifstream;
 using std::endl;
+using std::getline;
+using std::istringstream;
 
 // Used for various debugging functions, set to false on release
 #define DEBUG true
