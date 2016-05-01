@@ -38,16 +38,17 @@ int main() {
 	while (!correct){
 		if (choice == 'a' || choice == 'A'){
 			for(int i = 0; i < numProcesses; i++){
-				simFile << i << " ";												//process id
-				simFile << rand() % (RUN_MAX - RUN_MIN +1) + RUN_MIN << " ";		//total runtime
-				simFile << rand() % (IO_MAX+1) << " ";								//number of IO requests
-				simFile << rand() % SIZE_MAX + SIZE_MIN << endl;					//size of process in MB
+				simFile << rand() % (RUN_MAX - RUN_MIN +1) + RUN_MIN << "\t\t";		//total runtime
+				simFile << rand() % (IO_MAX+1) << "\t";								//number of IO requests
+				simFile << rand() % SIZE_MAX + SIZE_MIN;							//size of process in MB
+				if(i != (numProcesses - 1)){
+					simFile << endl;
+				}
 			}
 			correct = true;
 		}else if(choice == 'm'|| choice == 'M'){
 			cout << "Processes can also be manually changed within the Proccesses.txt file once generated." << endl;
 			for(int i = 0; i < numProcesses; i++){
-				simFile << i << " ";												//process id
 				do {
 					cout << "Please input the total run time of process "<< i << " (10 to 950): ";
 					cin >> input;
@@ -55,7 +56,7 @@ int main() {
 						cout << "ERROR: Input not within bounds." << endl;
 					}
 				} while (input < 10 || input > 950);
-				simFile << input << " ";											//total runtime
+				simFile << input << "\t\t";											//total runtime
 				do {
 					cout << "Please input the number of IO requests for process "<< i << " (0 to 5): ";
 					cin >> input;
@@ -63,7 +64,7 @@ int main() {
 						cout << "ERROR: Input not within bounds." << endl;
 					}
 				} while (input < 0 || input > 5);
-				simFile << input << " ";											//number of IO requests
+				simFile << input << "\t";											//number of IO requests
 				do {
 					cout << "Please input the size of process "<< i << " (1 to 8 MB): ";
 					cin >> input;
@@ -71,7 +72,10 @@ int main() {
 						cout << "ERROR: Input not within bounds." << endl;
 					}
 				} while (input < 1 || input > 8);
-				simFile << input << endl;											//size of process in MB
+				simFile << input;												//size of process in MB
+				if(i != (numProcesses - 1)){
+					simFile << endl;
+				}
 			}
 			correct = true;
 		}
