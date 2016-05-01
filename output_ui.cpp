@@ -37,6 +37,12 @@ void display_memory () {
 }
 
 
+// From the Project Specifications:
+// For each active process the following information should be displayed:
+// amount of CPU time needed to complete, amount of CPU time already used,
+// priority (if relevant), number of I/O requests satisfied,
+// number of outstanding I/O requests.
+
 void display_ui () {
 
 	unsigned int index;
@@ -44,7 +50,7 @@ void display_ui () {
 	clear_console();
 
 	cout << "New Queue size: " << new_queue.size() << endl;
-	cout << "----------------" << endl;
+	cout << "------------------" << endl;
 	cout << "->";
 	for (index = 0; index < new_queue.size(); index++) {
 		cout << "[" << new_queue.at(index).get_id() << "]"<<" ";
@@ -53,7 +59,7 @@ void display_ui () {
 	cout << endl << endl;
 
 	cout << "Ready Queue size: " << ready_queue.size() << endl;
-	cout << "----------------" << endl;
+	cout << "--------------------" << endl;
 	cout << "->";
 	for (index = 0; index < ready_queue.size(); index++) {
 		cout << "[" << ready_queue.at(index).get_id() << "]"<<" ";
@@ -76,20 +82,30 @@ void display_ui () {
 
 	}
 	else {
-        cout << "No processes running" << endl;
+        cout << "No process running" << endl;
 	}
 
     cout << endl << endl;
 
 	cout << "Blocked Queue size: " << blocked_queue.size() << endl;
-	cout << "----------------" << endl;
+	cout << "---------------------" << endl;
 	cout << "->";
 	for (index = 0; index < blocked_queue.size(); index++) {
 		cout << "[" << blocked_queue.at(index).get_id() << "]"<<" ";
 	}
+
+	cout << endl << endl;
+
+	cout << "Exiting Process " << endl;
+	cout << "---------------" << endl;
+	if (!finished_list.empty()) {
+		cout << "[" << finished_list.front().get_id() << "]";
+		finished_list.erase(finished_list.begin());
+	}
+
 	cout << endl << endl << endl;
 
-	cout << state_changed_description << endl;
+	cout << state_changed_description << endl << endl;
 }
 
 /*

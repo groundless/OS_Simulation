@@ -7,6 +7,7 @@
 #include "long_term_scheduler.h"
 #include "short_term_scheduler.h"
 #include "output_ui.h"
+#include "process_arrival.h"
 
 
 
@@ -16,6 +17,7 @@ std::vector<PCB> process_list;
 /*
  * Temporary debugging processes coming into the OS
  */
+/*
 void debug_input_processing() {
 	int num_processes = 10;
 	int size_min = 1;
@@ -36,7 +38,7 @@ void debug_input_processing() {
 				"NEW",
 				rand() % runtime_max + runtime_min,
 				0,
-				io_max,
+				0,
 				io_min,
 				rand() % size_max + size_min);
 		process_list.push_back(next_process);
@@ -54,6 +56,7 @@ PCB retrieve_next_process () {
 	process_list.pop_back();
 	return next_process;
 }
+*/
 
 /*
  * Flag which indicates whether we are allowing the OS
@@ -93,31 +96,26 @@ void hold_on_state_change() {
 
 int main(void)
 {
+	// Creates a stream and checks to see if the Processes.txt file exists.
+	// If it doesn't, the program returns an error and will exit.
+	ifstream inputProcesses;
+	inputProcesses.open("Processes.txt");
+	while(!inputProcesses.is_open()) {
+		cout << "ERROR: file Process.txt can not be opened. Please check that Process.txt is in the correct folder." << endl;
+		exit(0);
+	}
+
+	// Checks the Processes.txt file for any errors in formatting
+	check_file(inputProcesses);
+
 	initialize_console();
-	/*
-	 * Initially read in inputs and build processes
-	 * Run long term scheduler to put a few processes into NEW
-	 * Allocate memory for processes in NEW to put into READY
-	 * Run short term scheduler to bring a process from READY->RUNNING
-	 * Loop time cycles and process interrupts
-	 */
+	// Initially read in inputs and build processes
+	// Run long term scheduler to put a few processes into NEW
+	// Allocate memory for processes in NEW to put into READY
+	// Run short term scheduler to bring a process from READY->RUNNING
+	// Loop time cycles and process interrupts
 
 	initialize_memory();
-
-	/*
-	 * Temporary debugging process generation
-	 * See the above functions
-	 */
-
-	debug_input_processing();
-
-	/*
-	 * Initial process arrival, the OS always starts with something running?
-	 * This potentially simplifies the main loop and makes the fetch-execute-interrupt
-	 * logic more apparent.
-	 */
-
-	new_process_arrival(retrieve_next_process());
 
 	string input = "";
 	int cycle_count = 0;
@@ -125,7 +123,7 @@ int main(void)
 	do {
 
 		// Check if any new processes have arrived first. If no processes have arrived, only passes a NULL reference.
-		new_process_arrival(retrieve_next_process()); hold_on_state_change();
+		new_process_arrival(retrieve_next_process(inputProcesses)); hold_on_state_change();
 
 		// Long term scheduler. Implemented as First Come First Serve.
 		long_term_scheduler(); hold_on_state_change();
@@ -146,8 +144,8 @@ int main(void)
 		process_io_devices(); hold_on_state_change();
 
 		// Check if the simulation is finished. If process file is empty, and all queues are empty.
-		if (new_queue.empty() && blocked_queue.empty() && running_process.check_state("NULL") && ready_queue.empty()) {
-            cout << "OS Simulation has finished" << endl;
+		if (new_queue.empty() && blocked_queue.empty() && running_process.check_state("NULL") && ready_queue.empty() && inputProcesses.eof()) {
+            cout << "OS Simulation has finished, after " << cycle_count << " cycles." << endl;
             input = "exit";
 		}
 

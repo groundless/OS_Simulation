@@ -6,14 +6,6 @@
 #include "long_term_scheduler.h"
 #include "short_term_scheduler.h"
 
-
-// Counter for the number of cycles the current running process
-// has executed while in the RUNNING state. If the counter has
-// reached TEN, indicating the maximum cycles for a time slice,
-// then the time slice for the current process has ended.
-int round_robin_counter = 0;
-
-
 // "The short-term scheduler, also known as the dispatcher, executes most frequently
 // and makes the fine-grained decisions of which process to execute next. The short-term
 // scheduler is invoked whenever an event occurs that may lead to the blocking of the current
@@ -41,19 +33,23 @@ void short_term_scheduler () {
 			// first get the next process from the ready queue.
 			running_process = ready_queue.front();
 
-			// Remove that process from the front of the ready queue
-			ready_queue.erase(ready_queue.begin());
-
-			// Reset the time slice counter, this could also happen because the previous process was BLOCKED.
-			round_robin_counter = 0;
-
-			if (DEBUG) cout << "DEBUG: (short_term_scheduler): put process: " << running_process.get_id() << " into running" << endl;
-
 			// A process has changed from READY to RUNNING.
 			state_changed_flag = true;
 			stringstream ss;
-			ss << "Process [" << running_process.get_id() << "] has moved from Ready to Running";
+			if (running_process.get_id() == ready_queue.back().get_id() && running_process.get_scheduling_counter() == 10)
+				ss << "The time slice for Process [" << running_process.get_id() << "]" << " has ended. \n"
+				   << "No preemption occurs. Process [" << running_process.get_id() << "] remains in Running.";
+			else
+				ss << "Process [" << running_process.get_id() << "] has moved from Ready to Running.";
 			state_changed_description = ss.str();
+
+			// Remove that process from the front of the ready queue
+			ready_queue.erase(ready_queue.begin());
+
+			if (DEBUG) cout << "DEBUG: (short_term_scheduler): put process: " << running_process.get_id() << " into running" << endl;
+
+			// Reset the time slice counter, this could also happen because the previous process was BLOCKED.
+			running_process.reset_scheduling_counter();
 		}
 	}
 	// A process is already running.
@@ -62,17 +58,18 @@ void short_term_scheduler () {
 		if (DEBUG) cout << "DEBUG: (short_term_scheduler): Current running process ID is :" << running_process.get_id() << endl;
 
 		// Increment the counter for the current process time slice.
-		round_robin_counter++;
+		running_process.increment_scheduling_counter();
 
-		if (DEBUG) cout << "DEBUG: (short_term_scheduler): time slice counter is: " << round_robin_counter << endl;
+		if (DEBUG) cout << "DEBUG: (short_term_scheduler): time slice counter is: " << running_process.get_scheduling_counter() << endl;
 
 		// Ten is the maximum number of cycles for a time slice.
 		// Preemption now occurs, moving the current running process back to ready.
 		// The short term scheduler now runs again.
-		if (round_robin_counter == 10){
+		if (running_process.get_scheduling_counter() == 10){
 
 			ready_queue.push_back(running_process);
 
+			// Set the current running process to NULL.
 			PCB null_process;
 			running_process = null_process;
 			running_process.set_state("NULL");
