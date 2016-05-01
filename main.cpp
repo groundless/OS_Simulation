@@ -9,53 +9,7 @@
 #include "long_term_scheduler.h"
 #include "short_term_scheduler.h"
 #include "output_ui.h"
-
-
-
-// Temporary list of processes simulating arrival.
-std::vector<PCB> process_list;
-
-/*
- * Temporary debugging processes coming into the OS
- */
-void debug_input_processing() {
-	int num_processes = 10;
-	int size_min = 1;
-	int size_max = 8;
-	//int arrival_min = 10;
-	//int arrival_max = 100;
-	int runtime_min = 1;
-	int runtime_max = 100;
-	int io_min = 0;
-	int io_max = 0;
-
-	srand(time(NULL));
-
-	int index;
-	for (index = 0; index < num_processes; index++) {
-		PCB next_process(
-				rand() % 99 + 1,
-				"NEW",
-				rand() % runtime_max + runtime_min,
-				0,
-				io_max,
-				io_min,
-				rand() % size_max + size_min);
-		process_list.push_back(next_process);
-	}
-}
-
-PCB retrieve_next_process () {
-	PCB next_process;
-	next_process.set_state("NULL");
-	if (process_list.empty()) {
-		if (DEBUG){cout << "Process list is empty" << endl;}
-		return next_process;
-	}
-	next_process = process_list.back();
-	process_list.pop_back();
-	return next_process;
-}
+#include "process_arrival.h"
 
 /*
  * Flag which indicates whether we are allowing the OS
@@ -79,6 +33,24 @@ void hold_on_state_change() {
 
 int main(void)
 {
+	srand(time(NULL));
+
+	/*
+	 * Creates a stream and checks to see if the Processes.txt file exists.
+	 * If it doesn't, the program returns an error and will exit.
+	*/
+	
+	ifstream inputProcesses;
+	inputProcesses.open("Processes.txt");
+	while(!inputProcesses.is_open()) {
+		cout << "ERROR: file Process.txt can not be opened. Please check that Process.txt is in the correct folder." << endl;
+		exit(0);
+	}
+	
+	//Checks the Processes.txt file for any errors in formatting
+
+	check_file(inputProcesses);
+	
 	initialize_console();
 	/*
 	 * Initially read in inputs and build processes
@@ -91,19 +63,12 @@ int main(void)
 	initialize_memory();
 
 	/*
-	 * Temporary debugging process generation
-	 * See the above functions
-	 */
-
-	debug_input_processing();
-
-	/*
 	 * Initial process arrival, the OS always starts with something running?
 	 * This potentially simplifies the main loop and makes the fetch-execute-interrupt
 	 * logic more apparent.
 	 */
 
-	new_process_arrival(retrieve_next_process());
+	new_process_arrival(retrieve_next_process(inputProcesses));
 
 
 	/* Fetch-execute-interrupt begins
@@ -148,7 +113,7 @@ int main(void)
 		 * Check if any new processes have arrived first.
 		 * If no processes have arrived, only passes a NULL reference.
 		 */
-		new_process_arrival(retrieve_next_process()); hold_on_state_change();
+		new_process_arrival(retrieve_next_process(inputProcesses));; hold_on_state_change();
 
 		/*
 		 * Long term FCFS scheduler
@@ -209,3 +174,4 @@ int main(void)
 
 	return 0;
 }
+
