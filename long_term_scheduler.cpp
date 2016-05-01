@@ -8,7 +8,6 @@
 // Used to determine whether memory is available for a process.
 int available_memory;
 
-
 // Basic initializations go here to keep the code clean.
 void initialize_memory()
 {
@@ -19,18 +18,21 @@ void initialize_memory()
 		main_memory[i] = 0;
 }
 
-//
-// New processes are allocated memory in the main_memory array. 
-//
-void memory_allocate(PCB new_arrival)
+// Efficiently allocates memory in the main_memory array.
+// Integrated with the PCB data structure get the size information.
+void memory_allocate (PCB new_arrival)
 {
+	// Check the PCB of the incoming process for its ID and size.
 	int PID = new_arrival.get_id();
 	int requested_memory = new_arrival.get_size();
-	int free_memory = 0;
 
+	// Make sure that memory is available to allocate for the process.
+	int free_memory = 0;
 	while(main_memory[free_memory] != 0)
 		free_memory++;
 
+	// Place the process ID of the process into the free memory locations.
+	// Each memory location in the array represents one megabyte of memory.
 	if((MEM_SIZE - free_memory) >= requested_memory)
 		for(int i = free_memory; i < free_memory + requested_memory; i++)
 			main_memory[i] = PID;
@@ -38,12 +40,11 @@ void memory_allocate(PCB new_arrival)
 	else if (DEBUG) cout << "(memory_allocate): ERROR Not enough memory for process " << PID << endl;
 }
 
-// 
 // Processes that are finished running have their memory removed. 
 // Remaining memory is then shifted down. 
-//
 void memory_deallocate(PCB finished_process)
 {
+	// Variables i and j are indexes and shift memory down.
 	int i = 0;
 	int j;
 	int PID = finished_process.get_id();

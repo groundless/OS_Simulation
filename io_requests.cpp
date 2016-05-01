@@ -1,34 +1,28 @@
 //============================================================================
-// Name		   : interrupts.cpp
-// Author	   :
-// Version	   :
-// Description : Function declarations for the IO
+// Name		   : io_requests.cpp
+// Description : Functions related to the processing of IO requests.
 //============================================================================
 
 #include "io_requests.h"
 
 int io_cycle_count = 0;
 
-/*
- * The list of the simulated IO devices currently in use.
- * Each entry refers to an IO device which is currently satisfying
- * the IO request from a process. The location in the vector mirrors
- * the location of the process in the block_queue. i.e. If only one entry
- * is currently in the io_devices_active, then only one IO device is currently
- * satisfying a request for a single process in the blocked_queue.
- * NOTE: The simulation is capable of supporting multiple concurrent IO devices.
- * Such that many processes can currently and simultaneously be working with an
- * associated IO device per execution cycle.
- */
+// The list of the simulated IO devices currently in use.
+// Each entry refers to an IO device which is currently satisfying
+// the IO request from a process. The location in the vector mirrors
+// the location of the process in the block_queue. i.e. If only one entry
+// is currently in the io_devices_active, then only one IO device is currently
+// satisfying a request for a single process in the blocked_queue.
+// NOTE: The simulation is capable of supporting multiple concurrent IO devices.
+// Such that many processes can currently and simultaneously be working with an
+// associated IO device per execution cycle.
 std::vector<int> io_devices_active;
 
 
-/*
- * Check for interrupts, including both IO requests as well as
- * interrupts from the short term scheduler because of time slicing.
- * An I/O operation takes somewhere between 25 to 50 cycles.
- * A time slice occurs every ten cycles.
- */
+// Check for interrupts, including both IO requests as well as
+// interrupts from the short term scheduler because of time slicing.
+// An I/O operation takes somewhere between 25 to 50 cycles.
+// A time slice occurs every ten cycles.
 void check_io_interrupt () {
 
 	// Check if the running process has any IO requests
@@ -61,43 +55,6 @@ void check_io_interrupt () {
 		running_process = null_process;
 		running_process.set_state("NULL");
 	}
-
-/*
-	// Check if the IO device is in use
-	if (io_cycle_count > 0) {
-
-		// Execute a cycle of the IO device
-		io_cycle_count--;
-
-		if (DEBUG) cout << "DEBUG: (check_interupts): io_cycle_count is " << io_cycle_count << endl;
-
-		// Check if the IO has completed
-		if (io_cycle_count == 0) {
-
-			if (DEBUG) cout << "DEBUG: (check_interupts): IO Request Completed " << endl;
-			if (DEBUG) cout << "DEBUG: (check_interupts): Process " << blocked_queue.front().get_id() << " has completed an IO Request " << endl;
-
-			// Simulate completion of the IO request
-			blocked_queue.front().finish_iorequest();
-
-			// Move the process back onto the end of the Ready Queue
-			// State change BLOCKED->READY
-			ready_queue.push_back(blocked_queue.front());
-
-			// Remove the process from the blocked queue
-			blocked_queue.erase(blocked_queue.begin());
-
-			// Check if there are still outstanding IO Requests
-			if (!blocked_queue.empty()) {
-
-				 // Reset the cycle count for the next IO request
-				 io_cycle_count = rand() % 25 + 25;
-
-				 if (DEBUG) cout << "DEBUG: (check_interupts): Resetting io_cycle_count to " << io_cycle_count << endl;
-			}
-		}
-	}
-*/
 }
 
 void process_io_devices() {

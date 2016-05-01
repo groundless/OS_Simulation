@@ -1,9 +1,9 @@
 //============================================================================
 // Name        : short_term_scheduler.cpp
-// Description : Short term scheduling bringing processes READY to RUNNING
+// Description : Round Robin short term scheduler, manages processes moving
+//               from ready to running and from running to ready.
 //============================================================================
 
-#include "long_term_scheduler.h"
 #include "short_term_scheduler.h"
 
 // "The short-term scheduler, also known as the dispatcher, executes most frequently
@@ -15,6 +15,7 @@
 void short_term_scheduler () {
 
 	if (running_process.check_state("NULL")) {
+
 		if (DEBUG) cout << "DEBUG: (short_term_scheduler): no process currently running" << endl;
 
 		if (ready_queue.empty()) {
@@ -75,19 +76,6 @@ void short_term_scheduler () {
 			running_process.set_state("NULL");
 
 			short_term_scheduler();
-		}
-
-		// Check if that process has finished yet
-		// Redundant check? This happens in the execute_running_process() function
-		// this may never actually execute, CHECK THIS DURING DEBUGGING
-		if (running_process.runtime_remaining() == 0) {
-			if (DEBUG) cout << "DEBUG: (short_term_scheduler): Running Process has finished " << endl;
-			if (DEBUG) cout << "DEBUG: SHORT TERM SCHEDULER IS DOING READY->EXIT?" << endl;
-
-			exit (EXIT_FAILURE);
-
-			// The finished process now goes from READY->EXIT
-			process_exit();
 		}
 	}
 }

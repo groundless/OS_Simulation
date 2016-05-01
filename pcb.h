@@ -44,7 +44,7 @@ class PCB {
 	string state;
 
 	// Counter for the number of cycles the process while running
-	// has executed while in the RUNNING state. If the counter has
+	// has executed in the RUNNING state. If the counter has
 	// reached TEN, indicating the maximum cycles for a time slice,
 	// then the time slice for the current process has ended.
 	int scheduling_counter;

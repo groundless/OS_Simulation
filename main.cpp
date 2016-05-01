@@ -1,128 +1,42 @@
-//============================================================================
+//==================================================================================
 // Name        : main.cpp
-// Description : Main OS Simulation file.
-//============================================================================
+// Description : Main Operating System Simulation file.
+//==================================================================================
 
-#include "io_requests.h"
+#include "process_arrival.h"
 #include "long_term_scheduler.h"
 #include "short_term_scheduler.h"
+#include "io_requests.h"
 #include "output_ui.h"
-#include "process_arrival.h"
-
-
-
-// Temporary list of processes simulating arrival.
-std::vector<PCB> process_list;
-
-/*
- * Temporary debugging processes coming into the OS
- */
-/*
-void debug_input_processing() {
-	int num_processes = 10;
-	int size_min = 1;
-	int size_max = 8;
-	//int arrival_min = 10;
-	//int arrival_max = 100;
-	int runtime_min = 1;
-	int runtime_max = 100;
-	int io_min = 0;
-	int io_max = 5;
-
-	srand(time(NULL));
-
-	int index;
-	for (index = 0; index < num_processes; index++) {
-		PCB next_process(
-				rand() % 99 + 1,
-				"NEW",
-				rand() % runtime_max + runtime_min,
-				0,
-				0,
-				io_min,
-				rand() % size_max + size_min);
-		process_list.push_back(next_process);
-	}
-}
-
-PCB retrieve_next_process () {
-	PCB next_process;
-	next_process.set_state("NULL");
-	if (process_list.empty()) {
-		if (DEBUG){cout << "Process list is empty" << endl;}
-		return next_process;
-	}
-	next_process = process_list.back();
-	process_list.pop_back();
-	return next_process;
-}
-*/
-
-/*
- * Flag which indicates whether we are allowing the OS
- * to run to completion, i.e. slowly display the state
- * changes of the processes as the OS functions.
- */
-bool run_to_completion = false;
-/*
- * Step indicates the number of seconds to sleep between
- * states updating. User specified.
- */
-int step = 0;
-
-void hold_on_state_change() {
-	string input;
-	if (state_changed_flag && !run_to_completion) {
-		display_ui();
-		cout << "Press the enter key to continue, or type 'run' to run to completion. " << endl;
-		getline(cin, input);
-		state_changed_flag = false;
-		if (input == "run"){
-            run_to_completion = true;
-            cout << "How many seconds between each step? Enter a positive integer: ";
-            cin >> step;
-            cin.ignore(1000, '\n');
-		}
-		else if (input == "exit") {
-			exit(0);
-		}
-	}
-    else if (state_changed_flag && run_to_completion) {
-		display_ui();
-		state_changed_flag = false;
-		Sleep(step*1000);
-	}
-}
 
 int main(void)
 {
-	// Creates a stream and checks to see if the Processes.txt file exists.
+	string input = "";
+
+	// Counts the number of cycles the operating system runs for.
+	int cycle_count = 0;
+
+	// Creates a stream and checks if the Processes.txt file exists.
 	// If it doesn't, the program returns an error and will exit.
 	ifstream inputProcesses;
 	inputProcesses.open("Processes.txt");
-	while(!inputProcesses.is_open()) {
-		cout << "ERROR: file Process.txt can not be opened. Please check that Process.txt is in the correct folder." << endl;
+	while (!inputProcesses.is_open()) {
+		cout << "ERROR: The file Process.txt cannot be opened. Please check that Process.txt is in the same folder." << endl;
+		getline(cin, input);
 		exit(0);
 	}
 
-	// Checks the Processes.txt file for any errors in formatting
+	// Checks the Processes.txt file for any errors in formatting.
 	check_file(inputProcesses);
 
+	// Resize and move the console display window.
 	initialize_console();
-	// Initially read in inputs and build processes
-	// Run long term scheduler to put a few processes into NEW
-	// Allocate memory for processes in NEW to put into READY
-	// Run short term scheduler to bring a process from READY->RUNNING
-	// Loop time cycles and process interrupts
 
+	// Basic initializations within the OS.
 	initialize_memory();
 
-	string input = "";
-	int cycle_count = 0;
-
 	do {
-
-		// Check if any new processes have arrived first. If no processes have arrived, only passes a NULL reference.
+		// Check if any new processes have arrived first. Pulls process info from Processes.txt
 		new_process_arrival(retrieve_next_process(inputProcesses)); hold_on_state_change();
 
 		// Long term scheduler. Implemented as First Come First Serve.
@@ -131,10 +45,10 @@ int main(void)
 		// Short term preemptive scheduler. Implemented as Round Robin with a 10 cycle time slice.
 		short_term_scheduler(); hold_on_state_change();
 
-		// Increase cycle count to keep track of the number of cycles executed.
+		// Increase cycle count to keep track of the number of cycles executed by the operating system.
 		cycle_count++;
 
-		// Run the current process in the RUNNING state.
+		// Run the current process in the running state.
 		execute_running_process(); hold_on_state_change();
 
 		// Check for any interrupts from the currently running process.
@@ -143,8 +57,11 @@ int main(void)
 		// Check active IO devices
 		process_io_devices(); hold_on_state_change();
 
-		// Check if the simulation is finished. If process file is empty, and all queues are empty.
-		if (new_queue.empty() && blocked_queue.empty() && running_process.check_state("NULL") && ready_queue.empty() && inputProcesses.eof()) {
+		// Check if the simulation is finished. If the Processes.txt file is empty, and all queues are empty.
+		if (new_queue.empty() && blocked_queue.empty()
+							  && running_process.check_state("NULL")
+							  && ready_queue.empty()
+							  && inputProcesses.eof()) {
             cout << "OS Simulation has finished, after " << cycle_count << " cycles." << endl;
             input = "exit";
 		}

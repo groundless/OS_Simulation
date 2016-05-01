@@ -1,9 +1,7 @@
-/*
- * process_arrival.h
- *
- *  Created on: May 1, 2016
- *      Author: Aceco_000
- */
+//============================================================================
+// Name        : process_arrival.h
+// Description : Functions pertaining to simulated arrival of processes
+//============================================================================
 
 #ifndef PROCESS_ARRIVAL_H_
 #define PROCESS_ARRIVAL_H_

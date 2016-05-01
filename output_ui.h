@@ -21,6 +21,7 @@
  */
 //#define _WIN32_WINNT 0x0502
 
+void hold_on_state_change();
 void display_ui();
 void clear_console();
 void initialize_console();

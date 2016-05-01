@@ -1,8 +1,6 @@
 //============================================================================
-// Name		   : interrupts.h
-// Author	   :
-// Version	   :
-// Description : Function definitions for the IO
+// Name		   : io_requests.h
+// Description : Functions related to the processing of IO requests.
 //============================================================================
 
 #ifndef IO_REQUESTS_H_

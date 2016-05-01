@@ -5,6 +5,43 @@
 
 #include "output_ui.h"
 
+// Flag which indicates whether we are allowing the OS
+// to run to completion, i.e. slowly display the state
+// changes of the processes as the OS functions.
+bool run_to_completion = false;
+
+// Step indicates the number of seconds to sleep between
+// states updating. User specified.
+int step = 0;
+
+// The primary control function called after every major
+// function call to the operating system. This function lets
+// the user run to completion or continue to monitor the state
+// changes. Holds and waits for user input.
+void hold_on_state_change() {
+	string input;
+	if (state_changed_flag && !run_to_completion) {
+		display_ui();
+		cout << "Press the enter key to continue, or type 'run' to run to completion. " << endl;
+		getline(cin, input);
+		state_changed_flag = false;
+		if (input == "run"){
+            run_to_completion = true;
+            cout << "How many seconds between each step? Enter a positive integer: ";
+            cin >> step;
+            cin.ignore(1000, '\n');
+		}
+		else if (input == "exit") {
+			exit(0);
+		}
+	}
+    else if (state_changed_flag && run_to_completion) {
+		display_ui();
+		state_changed_flag = false;
+		Sleep(step*1000);
+	}
+}
+
 void display_memory () {
 
     cout << "Main Memory" << endl;

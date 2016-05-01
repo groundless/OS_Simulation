@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : process_arrival.cpp
-// Description : functions pertaining to simulated arrival of processes
+// Description : Functions pertaining to simulated arrival of processes
 //============================================================================
 
 #include "process_arrival.h"
@@ -12,7 +12,7 @@ PCB retrieve_next_process (ifstream& inputFile) {
 	string state = "NEW";
 	if(!empty_list){
 		if (arrival == 0){
-			arrival = rand() % (475-5+1)+5;
+			arrival = rand() % (200) + 50;
 			cycleCount++;
 		}else if(cycleCount == arrival){
 			arrival = 0;
@@ -37,6 +37,7 @@ PCB retrieve_next_process (ifstream& inputFile) {
 
 void check_file(ifstream& inputFile){
 	string line; int line_piece;
+	string input;
 	int runtime, io, size, on_line, count = 0;
 	std::vector<int> check_duplicates;
 	while(!inputFile.eof()){
@@ -50,6 +51,7 @@ void check_file(ifstream& inputFile){
 					runtime = line_piece;
 					if(runtime > 950 || runtime < 10){
 						cout << "ERROR: Process on line " << count+1 << "has an incorrect runtime value. Please make sure that the Processes.txt file follows the correct format and try again." << endl;
+						getline(cin,input);
 						exit(0);
 					}
 					break;
@@ -57,6 +59,7 @@ void check_file(ifstream& inputFile){
 					io = line_piece;
 					if(io > 5 || runtime < 0){
 						cout << "ERROR: Process on line " << count+1 << "has an incorrect IO value. Please make sure that the Processes.txt file follows the correct format and try again." << endl;
+						getline(cin,input);
 						exit(0);
 					}
 					break;
@@ -64,11 +67,13 @@ void check_file(ifstream& inputFile){
 					size = line_piece;
 					if(size > 8 || runtime < 1){
 						cout << "ERROR: Process on line " << count+1 << "has an incorrect size value. Please make sure that the Processes.txt file follows the correct format and try again." << endl;
+						getline(cin,input);
 						exit(0);
 					}
 					break;
 				default :
 					cout << "ERROR: Too many entries on line " << count+1 << ". Please make sure that the Processes.txt file follows the correct format and try again." << endl;
+					getline(cin,input);
 					exit(0);
 					break;
 			}
@@ -76,6 +81,7 @@ void check_file(ifstream& inputFile){
 		count++;
 		if(on_line < 3){
 			cout << "ERROR: Too few entries on line " << count << ". Please make sure that the Processes.txt file follows the correct format and try again." << endl;
+			getline(cin,input);
 			exit(0);
 		}
 	}
@@ -83,9 +89,11 @@ void check_file(ifstream& inputFile){
 	inputFile.seekg(0, inputFile.beg);
 	if(count < 10){
 		cout << "ERROR: too few processes in Processes.txt. Please make sure there are at least 10 processes in the file." << endl;
+		getline(cin,input);
 		exit(0);
 	}else if(count > 60){
 		cout << "ERROR: too many processes in Processes.txt. Please make sure there are no more than 60 processes in the file." << endl;
+		getline(cin,input);
 		exit(0);
 	}
 
