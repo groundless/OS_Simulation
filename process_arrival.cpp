@@ -69,11 +69,15 @@ void check_file(ifstream& inputFile){
 						exit(0);
 					}
 					break;
+				default :
+					cout << "ERROR: Too many entries on line " << count+1 << ". Please make sure that the Processes.txt file follows the correct format and try again." << endl;
+					exit(0);
+					break;
 			}
 		}
 		count++;
-		if(on_line != 3){
-			cout << "ERROR: Incorrect number of entries on line " << count << ". Please make sure that the Processes.txt file follows the correct format and try again." << endl;
+		if(on_line < 3){
+			cout << "ERROR: Too few entries on line " << count << ". Please make sure that the Processes.txt file follows the correct format and try again." << endl;
 			exit(0);
 		}
 	}
