@@ -5,49 +5,12 @@
 
 #include "output_ui.h"
 
-// Flag which indicates whether we are allowing the OS
-// to run to completion, i.e. slowly display the state
-// changes of the processes as the OS functions.
-bool run_to_completion = false;
-
-// Step indicates the number of seconds to sleep between
-// states updating. User specified.
-int step = 0;
-
-// The primary control function called after every major
-// function call to the operating system. This function lets
-// the user run to completion or continue to monitor the state
-// changes. Holds and waits for user input.
-void hold_on_state_change() {
-	string input;
-	if (state_changed_flag && !run_to_completion) {
-		display_ui();
-		cout << "Press the enter key to continue, or type 'run' to run to completion. " << endl;
-		getline(cin, input);
-		state_changed_flag = false;
-		if (input == "run"){
-            run_to_completion = true;
-            cout << "How many seconds between each step? Enter a positive integer: ";
-            cin >> step;
-            cin.ignore(1000, '\n');
-		}
-		else if (input == "exit") {
-			exit(0);
-		}
-	}
-    else if (state_changed_flag && run_to_completion) {
-		display_ui();
-		state_changed_flag = false;
-		Sleep(step*1000);
-	}
-}
-
 void display_memory () {
 
     cout << "Main Memory" << endl;
 	cout << endl;
 
-    //Adjusts spacing for indexes with 1 vs 2 numbers (eg. 7 vs 12)
+    //Print Indexes of Memory. Adjusts spacing for indexes with 1 vs 2 digits (eg. 7 vs 12)
 	for(int i = 0; i < 16; i++){
 
         if((i+1) < 10){
@@ -60,6 +23,8 @@ void display_memory () {
 
     cout << endl << "--------------------------------------------------------------------------------" << endl;
 
+
+    //Print process IDs in memory in a linear square format. Single digit numbers are preceded by a '0'
 	for(int i = 0; i < 16; i++){
 
         if(main_memory[i] < 10){
@@ -74,20 +39,19 @@ void display_memory () {
 }
 
 
-// From the Project Specifications:
-// For each active process the following information should be displayed:
-// amount of CPU time needed to complete, amount of CPU time already used,
-// priority (if relevant), number of I/O requests satisfied,
-// number of outstanding I/O requests.
-
 void display_ui () {
 
 	unsigned int index;
 
+    //Clear the screen
 	clear_console();
 
+    /*
+     * Following code prints out all the queues and the process ID's within them
+     */
+
 	cout << "New Queue size: " << new_queue.size() << endl;
-	cout << "------------------" << endl;
+	cout << "----------------" << endl;
 	cout << "->";
 	for (index = 0; index < new_queue.size(); index++) {
 		cout << "[" << new_queue.at(index).get_id() << "]"<<" ";
@@ -96,20 +60,21 @@ void display_ui () {
 	cout << endl << endl;
 
 	cout << "Ready Queue size: " << ready_queue.size() << endl;
-	cout << "--------------------" << endl;
-	cout << "->";
+	cout << "----------------" << endl;
+	cout << "->";//Arrow to show the head of the queue
 	for (index = 0; index < ready_queue.size(); index++) {
 		cout << "[" << ready_queue.at(index).get_id() << "]"<<" ";
 	}
 
 	cout << endl << endl;
 
+    //Shows IDs of processes loaded into memory.
     display_memory();
 
     cout << "Running process: " << endl
 		<< "-----------------" << endl;
-    cout << "->";
-	if (!running_process.check_state("NULL")) {
+    cout << "->";//Arrow to show the head of the queue
+	if (!running_process.check_state("NULL")) { //Check if there is a process in the running queue
 
         cout
         << "ID: " << running_process.get_id() <<" "<< endl
@@ -119,30 +84,21 @@ void display_ui () {
 
 	}
 	else {
-        cout << "No process running" << endl;
+        cout << "No processes running" << endl;
 	}
 
     cout << endl << endl;
 
 	cout << "Blocked Queue size: " << blocked_queue.size() << endl;
-	cout << "---------------------" << endl;
+	cout << "----------------" << endl;
 	cout << "->";
 	for (index = 0; index < blocked_queue.size(); index++) {
 		cout << "[" << blocked_queue.at(index).get_id() << "]"<<" ";
 	}
-
-	cout << endl << endl;
-
-	cout << "Exiting Process " << endl;
-	cout << "---------------" << endl;
-	if (!finished_list.empty()) {
-		cout << "[" << finished_list.front().get_id() << "]";
-		finished_list.erase(finished_list.begin());
-	}
-
 	cout << endl << endl << endl;
 
-	cout << state_changed_description << endl << endl;
+    //Output which process (ID) changed state and the state change itself. Set by functions which cause state changes
+	cout << state_changed_description << endl;
 }
 
 /*
