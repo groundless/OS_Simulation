@@ -10,7 +10,14 @@ PCB retrieve_next_process (ifstream& inputFile) {
 	static int cycleCount = 0, arrival = 0, PID = 0;
 	static bool empty_list = false;
 	string state = "NEW";
+	
+	// Process sets the empty_list variable to true once the file reaches the end
+	
 	if(!empty_list){
+		
+		// arrival is based of a random number generator as seen below.
+		// This allows the user to see how the code handles long and short intervals between arrivals
+
 		if (arrival == 0){
 			arrival = rand() % (200) + 50;
 			cycleCount++;
@@ -35,17 +42,27 @@ PCB retrieve_next_process (ifstream& inputFile) {
 	return next_process;
 }
 
+// This function is called once at the start of main
+// It guarantees that there are no unwanted bugs or error in the Processes.txt file
+
 void check_file(ifstream& inputFile){
 	string line; int line_piece;
 	string input;
 	int runtime, io, size, on_line, count = 0;
-	std::vector<int> check_duplicates;
 	while(!inputFile.eof()){
 		on_line = 0;
 		getline(inputFile,line);
+		
+		// This allows the line taken from the file to be slpit apart based on white space and stored into an integer individually
+
 		istringstream seperate(line);
 		while(seperate >> line_piece){
 			on_line++;
+			
+			// checking bounds
+			// case 1 : Runtime, case 2: IO requests, case 3: Size in Memory,
+			// default case: informs the user that there are too many entries on a given line in the code, breaking format
+
 			switch(on_line){
 				case 1:
 					runtime = line_piece;
@@ -85,6 +102,9 @@ void check_file(ifstream& inputFile){
 			exit(0);
 		}
 	}
+	
+	// resets the file's eof flag to be reused later in the program and puts the pointer back at the beginning of the file
+
 	inputFile.clear();
 	inputFile.seekg(0, inputFile.beg);
 	if(count < 10){
